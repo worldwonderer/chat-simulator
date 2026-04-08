@@ -11,3 +11,7 @@ recovered-app/tsconfig.tsbuildinfo
 
 # local servers / logs
 *.log
+.pytest_cache/
+.ruff_cache/
+.idea/
+.vscode/

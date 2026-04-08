@@ -9,7 +9,7 @@
 
 ## 运行方式
 ```bash
-cd /Users/pite/Work/recovery-what.arksec.net-2026-04-08/recovered-app
+cd ../recovered-app
 npm install
 npm run dev
 # 或
@@ -18,8 +18,8 @@ npm run start -- --port 4180
 ```
 
 ## 验证脚本
-- 精确镜像验证：`/Users/pite/Work/recovery-what.arksec.net-2026-04-08/scripts/verify_fidelity.py`
-- 源码高保真验证：`/Users/pite/Work/recovery-what.arksec.net-2026-04-08/scripts/verify_recovered_source_fidelity.py`
+- 精确镜像验证：`../scripts/verify_fidelity.py`
+- 源码高保真验证：`../scripts/verify_recovered_source_fidelity.py`
 
 ## 结构说明
 - `components/RecoveredChatSimulator.jsx`：从主业务 chunk 回译出的完整前端逻辑
