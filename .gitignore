@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.DS_Store
+
+# temp downloads / local caches
+downloads/
+recovered-app/node_modules/
+recovered-app/.next/
+recovered-app/tsconfig.tsbuildinfo
+
+# local servers / logs
+*.log
