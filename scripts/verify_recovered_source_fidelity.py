@@ -6,10 +6,10 @@ from PIL import Image, ImageChops
 
 ROOT = Path('/Users/pite/Work/recovery-what.arksec.net-2026-04-08/output/playwright')
 PAIRS = [
-    ('remote-home.png', 'source-home.png', 'home'),
-    ('remote-name.png', 'source-name.png', 'name'),
-    ('remote-playing.png', 'source-playing.png', 'playing'),
-    ('remote-ending.png', 'source-ending.png', 'ending'),
+    ('local-home.png', 'source-home.png', 'home'),
+    ('local-name.png', 'source-name.png', 'name'),
+    ('local-playing-fresh.png', 'source-playing.png', 'playing'),
+    ('local-ending-fresh.png', 'source-ending.png', 'ending'),
 ]
 results = []
 for remote_name, source_name, label in PAIRS:
@@ -46,9 +46,9 @@ verdict = {
     'score': score,
     'verdict': 'pass' if all_pass else 'revise',
     'category_match': True,
-    'differences': [] if all_pass else ['Recovered source still visually diverges from remote beyond threshold on at least one checked state.'],
+    'differences': [] if all_pass else ['Recovered source still visually diverges from the exact local mirror beyond threshold on at least one checked state.'],
     'suggestions': [] if all_pass else ['Tighten source parity in the listed screens and rerun screenshot diff.'],
-    'reasoning': 'Recovered source is visually indistinguishable from remote on checked states within strict diff thresholds.' if all_pass else 'Recovered source still needs visual parity work.',
+    'reasoning': 'Recovered source is visually indistinguishable from the exact local mirror on checked states within strict diff thresholds.' if all_pass else 'Recovered source still needs visual parity work.',
     'results': results,
 }
 print(json.dumps(verdict, ensure_ascii=False, indent=2))

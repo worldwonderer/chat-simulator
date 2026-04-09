@@ -77,3 +77,13 @@
 ## 项目规划文档
 - 已新增：`docs/project-roadmap.md`
 - 该文档将后续工作拆成稳态交付、源码治理、回归系统、资产去镜像化、产品迭代五个阶段。
+
+
+## Phase 1 进展
+- 已新增：`docs/phase1-module-split-plan.md`
+- 已完成第一刀拆分：
+  - `RecoveredChatSimulator.jsx` → 轻量入口
+  - `recovered/RecoveredPhoneShell.jsx` → 外壳层
+  - `recovered/screens/*` → 屏幕入口层
+  - `recovered/RecoveredCore.jsx` → 暂存核心逻辑层
+- 当前结论：行为保持不变，后续可继续把 core 拆成 `store / scene-engine / ending-engine / helpers`。
