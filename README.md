@@ -73,5 +73,6 @@ cd recovered-app && npm run build
 
 - `RECOVERY_REPORT.md`
 - `docs/cleanup-plan.md`
+- `docs/project-roadmap.md`
 - `.omx/plans/prd-chat-simulator-recovery.md`
 - `.omx/plans/test-spec-chat-simulator-recovery.md`

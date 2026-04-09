@@ -72,3 +72,8 @@
   - name: mean_abs=0.010482, nonzero_ratio=0.001526
   - playing: mean_abs=0.014244, nonzero_ratio=0.001991
   - ending: mean_abs=0.033905, nonzero_ratio=0.007000
+
+
+## 项目规划文档
+- 已新增：`docs/project-roadmap.md`
+- 该文档将后续工作拆成稳态交付、源码治理、回归系统、资产去镜像化、产品迭代五个阶段。
