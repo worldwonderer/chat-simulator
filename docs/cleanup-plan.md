@@ -1,18 +1,17 @@
 # Cleanup Plan
 
 ## Goal
-把当前仓库整理成一个正常的单项目结构：根目录就是唯一的可运行应用，业务代码和数据使用标准命名，不再依赖 `recovered-app/` 这层恢复期壳结构。
+把当前仓库维持在正常的单项目结构：根目录就是唯一的可运行应用，业务代码和数据使用标准命名，恢复期目录壳已经退场。
 
 ## Why now
-- 当前根目录应用只是一个薄壳，真正代码还挂在 `recovered-app/` 下面
-- 业务文件名和目录名带有大量 `Recovered*` / `recovered-*` 痕迹，不利于长期维护
-- 校验脚本和文档仍按“恢复工程”假设编写，不适合后续持续新增剧情
+- 该仓库已经完成从恢复工程到正常项目的收口，需要保留一份面向后续维护的整理记录
+- 未来新增剧情和功能时，需要明确哪些历史资产仍是基线，哪些目录才是正式开发路径
 
 ## Scope
-1. 把 `recovered-app/` 中仍在使用的源码/数据提升到仓库根目录的正式应用结构
-2. 去掉业务主路径中的 `Recovered*` / `recovered-*` 命名
-3. 把构建、CI、README、校验脚本统一到根目录单项目模式
-4. 保留 `mirror/`、`extracted/`、恢复报告等历史资产，但降级为参考/归档材料，而不是主开发入口
+1. 维持根目录作为唯一正式应用结构
+2. 保持业务主路径不再出现恢复期命名和目录依赖
+3. 保持构建、CI、README、校验脚本统一到根目录单项目模式
+4. 保留 `mirror/`、`extracted/`、恢复报告等历史资产，但仅作为参考/归档材料
 
 ## Non-goals
 - 不改剧情内容
@@ -37,26 +36,22 @@
 ```
 
 ## Planned changes
-1. 提升源码
-   - 将 `recovered-app/components/*` 迁移到根目录 `components/`
-   - 将 `recovered-app/data/*` 迁移到根目录 `data/`
-   - 根目录 `app/` 直接引用正式组件，不再穿透到 `recovered-app/`
+1. 结构收口
+   - 根目录 `app/`、`components/`、`data/`、`public/` 为唯一正式应用路径
+   - screen 逻辑落在 `components/chat/screens/*`
+   - 可复用 UI 落在 `components/chat/ui/*`
 
-2. 规范命名
-   - `RecoveredChatSimulator` → `ChatSimulator`
-   - `RecoveredPhoneShell` → `PhoneShell`
-   - 过渡型核心文件 → `screens/*` + `ui/*`
-   - 其他 `recovered/*` 路径同步改为标准 `chat/*`
+2. 命名收口
+   - 主动代码路径不再使用恢复期命名
+   - runtime / store / data 接口使用语义化正式名字
 
-3. 单项目化
-   - CI 改为直接安装/构建根目录项目
-   - Makefile 与 README 改成根目录工作流
-   - 删除 `recovered-app/` 这套重复项目壳
+3. 工具链收口
+   - CI、Makefile、README、校验脚本全部面向根目录项目
+   - 恢复期脚本迁移到 `scripts/recovery/`
 
-4. 校验脚本正常化
-   - 仓库检查改为验证正式应用结构，而不是死盯恢复期目录名
-   - 去掉“固定剧情数量”这种不利于后续扩展的硬编码校验
-   - 把“源码高保真校验”命名调整为更通用的 source fidelity 校验
+4. 校验规则
+   - 仓库检查验证正式应用结构与剧情跳转链
+   - source fidelity 与 mirror fidelity 保持可运行
 
 ## Safety / Regression Guard
 - 清理前已确认根目录 `npm run build` 可通过
@@ -68,7 +63,7 @@
 
 ## Exit criteria
 - 根目录成为唯一正式应用入口
-- 主业务代码路径不再包含 `Recovered*` / `recovered-app`
+- 主业务代码路径不再包含恢复期命名或恢复期目录依赖
 - README 与 CI 均使用根目录工作流
 - 构建通过，结构校验通过，source fidelity 校验通过
 
