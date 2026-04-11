@@ -80,6 +80,11 @@
 
 
 ## Phase 1 进展
+- 已完成第二刀拆分：
+  - `gameData.js` → 数据层
+  - `endingPools.js` → 结局池
+  - `store.js` → 状态层
+  - `gameEngine.js` → 场景推进与结局运行时
 - 已新增：`docs/phase1-module-split-plan.md`
 - 已完成第一刀拆分：
   - `RecoveredChatSimulator.jsx` → 轻量入口

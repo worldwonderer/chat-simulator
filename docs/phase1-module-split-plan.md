@@ -27,3 +27,16 @@
 - 构建通过
 - 源码高保真验证通过
 - 模块边界比单文件入口更清晰
+
+
+## Completed work
+- 已拆出入口层：`RecoveredChatSimulator.jsx`
+- 已拆出外壳层：`RecoveredPhoneShell.jsx`
+- 已拆出屏幕层：`screens/IntroView.jsx`、`screens/PlayingView.jsx`、`screens/EndingView.jsx`
+- 已拆出数据层：`gameData.js`
+- 已拆出结局池：`endingPools.js`
+- 已拆出状态层：`store.js`
+- 已拆出运行时引擎：`gameEngine.js`
+
+## Phase 1 verdict
+Phase 1 已达到当前里程碑：主入口不再承担全部职责，数据 / 状态 / 引擎 / 屏幕已经形成独立模块边界，且构建与高保真验证仍保持通过。
