@@ -19,3 +19,4 @@ recovered-app/tsconfig.tsbuildinfo
 node_modules/
 .next/
 .vercel/
+.omx/
