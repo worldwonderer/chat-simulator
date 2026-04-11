@@ -92,3 +92,11 @@
   - `recovered/screens/*` → 屏幕入口层
   - `recovered/RecoveredCore.jsx` → 暂存核心逻辑层
 - 当前结论：行为保持不变，后续可继续把 core 拆成 `store / scene-engine / ending-engine / helpers`。
+
+
+## Deployment
+- Vercel project: `chat-vibecoco-ai`
+- Production deployment: `https://chat-vibecoco-pk6yzzrrn-worldwonderers-projects.vercel.app`
+- Custom domain: `https://chat.vibecoco.ai`
+- Domain status: bound to project and returning HTTP 200 over HTTPS
+- HTTP behavior: `http://chat.vibecoco.ai/` → `308` redirect to HTTPS
