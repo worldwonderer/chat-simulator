@@ -100,3 +100,7 @@
 - Custom domain: `https://chat.vibecoco.ai`
 - Domain status: bound to project and returning HTTP 200 over HTTPS
 - HTTP behavior: `http://chat.vibecoco.ai/` → `308` redirect to HTTPS
+
+- Git auto deploy: connected via `vercel git connect` and verified by a fresh Git-triggered production deployment
+- Latest git-driven production deployment: `https://chat-vibecoco-1prxr3516-worldwonderers-projects.vercel.app`
+- Live copy check: `--BY ARKSEC.NET 🩷` no longer appears on `https://chat.vibecoco.ai/`
