@@ -22,15 +22,13 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: recovered-app/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Repository structure check
         run: python3 scripts/check_repository.py
 
-      - name: Install recovered source dependencies
-        working-directory: recovered-app
+      - name: Install app dependencies
         run: npm ci
 
-      - name: Build recovered source
-        working-directory: recovered-app
+      - name: Build app
         run: npm run build

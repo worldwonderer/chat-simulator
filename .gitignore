@@ -5,9 +5,7 @@ __pycache__/
 
 # temp downloads / local caches
 downloads/
-recovered-app/node_modules/
-recovered-app/.next/
-recovered-app/tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # local servers / logs
 *.log

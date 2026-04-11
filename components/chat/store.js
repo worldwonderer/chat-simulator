@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { i } from "./gameData";
+import { girlsById } from "./gameData";
 
 function createStore(initializer) {
   let state;
@@ -49,13 +49,13 @@ function createStoreHook(initializer) {
   return Object.assign(useStore, store);
 }
 
-export const h = createStoreHook((setState) => ({
+export const useGameStore = createStoreHook((setState) => ({
   phase: "intro",
   playerName: "",
   currentGirlId: "lin",
-  girlName: i.lin.name,
-  girlAvatar: i.lin.avatar,
-  currentSceneId: i.lin.firstScene,
+  girlName: girlsById.lin.name,
+  girlAvatar: girlsById.lin.avatar,
+  currentSceneId: girlsById.lin.firstScene,
   visibleMessages: [],
   affection: 20,
   anxiety: 0,
@@ -72,8 +72,8 @@ export const h = createStoreHook((setState) => ({
   initGirl: (girlId) =>
     setState({
       currentGirlId: girlId,
-      girlName: i[girlId].name,
-      girlAvatar: i[girlId].avatar,
+      girlName: girlsById[girlId].name,
+      girlAvatar: girlsById[girlId].avatar,
     }),
   resetGame: () =>
     setState({

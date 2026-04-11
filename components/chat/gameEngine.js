@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { i, l } from "./gameData";
-import { m } from "./endingPools";
-import { h } from "./store";
+import { girlsById, scenes } from "./gameData";
+import { endingPools } from "./endingPools";
+import { useGameStore } from "./store";
 
 let messageCounter = 0;
 let runToken = 0;
@@ -22,8 +22,8 @@ function appendMessage(message) {
   };
 }
 
-export function o(sceneId) {
-  return l.find((scene) => scene.id === sceneId);
+export function findScene(sceneId) {
+  return scenes.find((scene) => scene.id === sceneId);
 }
 
 function resolveEnding(scene) {
@@ -38,7 +38,7 @@ function resolveEnding(scene) {
   else if (scene.id.startsWith("chen_")) girlId = "chen";
 
   const endingType = scene.endingType === "good" ? "good" : "bad";
-  const pool = m[girlId][endingType];
+  const pool = endingPools[girlId][endingType];
   let index = 0;
 
   if (typeof window !== "undefined" && window.crypto) {
@@ -52,10 +52,10 @@ function resolveEnding(scene) {
   return pool[index];
 }
 
-export async function g(scene, token) {
+export async function runScene(scene, token) {
   if (token !== runToken) return;
 
-  h.setState({
+  useGameStore.setState({
     currentSceneId: scene.id,
     chapter: scene.chapter,
     timeLabel: scene.timeLabel ?? "",
@@ -69,8 +69,8 @@ export async function g(scene, token) {
     if (scene.autoNext) {
       await delay(800);
       if (token !== runToken) return;
-      const nextScene = o(scene.autoNext);
-      if (nextScene) await g(nextScene, token);
+      const nextScene = findScene(scene.autoNext);
+      if (nextScene) await runScene(nextScene, token);
     }
     return;
   }
@@ -78,7 +78,7 @@ export async function g(scene, token) {
   for (const rawMessage of messages) {
     if (token !== runToken) return;
 
-    const { playerName } = h.getState();
+    const { playerName } = useGameStore.getState();
     const content = rawMessage.content ? rawMessage.content.replace(/\{name\}/g, playerName ?? "你") : "";
 
     if (rawMessage.type === "silent") {
@@ -90,10 +90,10 @@ export async function g(scene, token) {
       let textLength = content.replace(/\[TIME\]/g, "").length;
       if (content.includes("[图片") || rawMessage.image) textLength = 5;
       const typingDelay = rawMessage.delay ?? Math.min(4500, Math.max(1200, 120 * textLength + 400));
-      h.setState({ isTyping: true });
+      useGameStore.setState({ isTyping: true });
       await delay(typingDelay);
       if (token !== runToken) return;
-      h.setState({ isTyping: false });
+      useGameStore.setState({ isTyping: false });
     } else if (rawMessage.sender === "system") {
       await delay(rawMessage.delay ?? 800);
     } else {
@@ -102,7 +102,7 @@ export async function g(scene, token) {
 
     if (token !== runToken) return;
 
-    h.setState((state) => ({
+    useGameStore.setState((state) => ({
       visibleMessages: [
         ...state.visibleMessages,
         appendMessage({
@@ -123,7 +123,7 @@ export async function g(scene, token) {
     await delay(1200);
     if (token !== runToken) return;
     const ending = resolveEnding(scene);
-    h.setState({
+    useGameStore.setState({
       phase: "ending",
       endingData: {
         title: ending.title,
@@ -137,26 +137,26 @@ export async function g(scene, token) {
   if (scene.choices?.length) {
     await delay(300);
     if (token !== runToken) return;
-    h.setState({ showChoices: true, currentChoices: scene.choices });
+    useGameStore.setState({ showChoices: true, currentChoices: scene.choices });
     return;
   }
 
   if (scene.autoNext) {
     await delay(900);
     if (token !== runToken) return;
-    const nextScene = o(scene.autoNext);
-    if (nextScene) await g(nextScene, token);
+    const nextScene = findScene(scene.autoNext);
+    if (nextScene) await runScene(nextScene, token);
   }
 }
 
-export function u() {
+export function useGameActions() {
   return {
     startGame: React.useCallback(() => {
       const token = (runToken += 1);
-      const { currentGirlId } = h.getState();
-      const firstSceneId = i[currentGirlId]?.firstScene ?? "scene_01";
+      const { currentGirlId } = useGameStore.getState();
+      const firstSceneId = girlsById[currentGirlId]?.firstScene ?? "scene_01";
 
-      h.setState({
+      useGameStore.setState({
         phase: "playing",
         currentSceneId: firstSceneId,
         visibleMessages: [],
@@ -174,13 +174,13 @@ export function u() {
       });
 
       setTimeout(() => {
-        const nextScene = o(firstSceneId);
-        if (nextScene) g(nextScene, token);
+        const nextScene = findScene(firstSceneId);
+        if (nextScene) runScene(nextScene, token);
       }, 80);
     }, []),
     selectChoice: React.useCallback((choice) => {
       const token = (runToken += 1);
-      const { playerName } = h.getState();
+      const { playerName } = useGameStore.getState();
       const renderedReply = (choice.replyText ?? choice.text)
         .replace(/\{name\}/g, playerName ?? "你")
         .replace(/^[（(][^）)]+[）)]\s*/, "")
@@ -199,7 +199,7 @@ export function u() {
           ]
         : [];
 
-      h.setState((state) => ({
+      useGameStore.setState((state) => ({
         showChoices: false,
         currentChoices: [],
         lastChoiceBadge: choice.badgeText ?? null,
@@ -212,14 +212,16 @@ export function u() {
             sceneId: state.currentSceneId,
             choiceId: choice.id,
             badgeText: choice.badgeText,
+            affectionDelta: choice.affectionDelta ?? 0,
+            anxietyDelta: choice.anxietyDelta ?? 0,
           },
         ],
         visibleMessages: [...state.visibleMessages, ...renderedMessages],
       }));
 
       setTimeout(() => {
-        const nextScene = o(choice.nextScene);
-        if (nextScene) g(nextScene, token);
+        const nextScene = findScene(choice.nextScene);
+        if (nextScene) runScene(nextScene, token);
       }, 600);
     }, []),
   };

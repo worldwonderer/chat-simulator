@@ -1,4 +1,4 @@
-export const m = {
+export const endingPools = {
         lin: {
           good: [
             {

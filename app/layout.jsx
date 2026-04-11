@@ -1,11 +1,11 @@
 export const metadata = {
   title: "聊天模拟器",
-  generator: "丁真",
+  description: "互动式聊天剧情模拟器",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <head>
         <link rel="preload" href="/mirror-static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2" as="font" crossOrigin="" type="font/woff2" />
         <link rel="preload" href="/mirror-static/media/caa3a2e1cccd8315-s.p.16t1db8_9y2o~.woff2" as="font" crossOrigin="" type="font/woff2" />

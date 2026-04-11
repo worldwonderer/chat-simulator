@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 from __future__ import annotations
+
 import json
 import re
 import subprocess
 from pathlib import Path
 
-ROOT = Path('/Users/pite/Work/recovery-what.arksec.net-2026-04-08')
+ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'extracted'
-CHUNK = Path('/Users/pite/Work/聊天模拟器_files/02zu64b6mj.y..js')
+CHUNK = ROOT / 'extracted' / 'module-96566.raw.js'
 
 
 def extract_balanced(text: str, start: int, open_char: str) -> str:
@@ -34,17 +35,9 @@ def extract_balanced(text: str, start: int, open_char: str) -> str:
             elif ch == close_char:
                 depth -= 1
                 if depth == 0:
-                    return text[start:i+1]
+                    return text[start : i + 1]
         i += 1
     raise ValueError(f'unbalanced expression starting at {start}')
-
-
-def extract_expr(text: str, marker: str, open_char: str) -> str:
-    idx = text.find(marker)
-    if idx == -1:
-        raise ValueError(f'marker not found: {marker}')
-    start = idx + len(marker)
-    return extract_balanced(text, start, open_char)
 
 
 def eval_js_expr(expr: str):

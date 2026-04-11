@@ -1,36 +1,29 @@
-# chat-simulator-recovery-20260408
+# chat-simulator
 
-一个面向团队交接的恢复仓库，包含两条交付线：
+一个已经整理成标准单项目结构的聊天模拟器仓库。
 
-- `mirror/`：**高保真精确镜像**，用于最低风险交付与快速恢复线上可用版本
-- `recovered-app/`：**可维护源码工程**，用于后续开发、重构和长期维护
+当前根目录就是唯一正式应用入口；`mirror/`、`extracted/` 和恢复报告仅作为历史基线与取证材料保留，不再是日常开发主路径。
 
 ## 仓库结构
 
 ```text
 .
-├── docs/                    # 计划与说明文档
-├── extracted/               # 从生产 bundle 抽取出的结构化资产与取证文件
-├── mirror/                  # 从线上抓取的精确本地镜像
-├── output/playwright/       # 截图验证证据
-├── recovered-app/           # 回译后的可运行源码工程
+├── app/                     # Next.js 路由入口
+├── components/
+│   ├── ChatSimulator.jsx    # 主应用入口组件
+│   └── chat/                # 聊天模拟器业务模块
+├── data/                    # 正式业务数据（剧情/角色/章节/话术）
+├── public/                  # 正式静态资源
 ├── scripts/                 # 启动/验证脚本
-├── RECOVERY_REPORT.md       # 恢复报告
-├── extract_game_data.py     # 抽取脚本（入口）
-└── mirror_site.py           # 镜像脚本（入口）
+├── docs/                    # 项目文档与历史资料
+├── mirror/                  # 恢复期精确镜像基线
+├── extracted/               # 恢复期抽取资产
+└── output/playwright/       # 截图验证证据
 ```
 
 ## 快速开始
 
-### 1. 启动精确镜像
 ```bash
-./scripts/serve_exact_mirror.sh
-# 默认 http://127.0.0.1:4173
-```
-
-### 2. 启动源码工程
-```bash
-cd recovered-app
 npm install
 npm run dev
 # 或
@@ -41,42 +34,48 @@ npm run start -- --port 4180
 ## 常用验证
 
 ```bash
-# 仓库结构与关键工件检查
+# 仓库结构与数据链路检查
 python3 scripts/check_repository.py
 
 # 精确镜像高保真校验
 python3 scripts/verify_fidelity.py
 
-# 源码工程高保真校验
-python3 scripts/verify_recovered_source_fidelity.py
+# 正式应用高保真校验
+python3 scripts/verify_source_fidelity.py
 
-# 源码工程构建
-cd recovered-app && npm run build
+# 应用构建
+npm run build
 ```
 
 ## 当前验证结论
 
 - exact mirror：`score=100`，关键状态 `home/name/playing/ending` 全部通过
-- recovered source：`score=97`，关键状态 `home/name/playing/ending` 全部通过
-- recovered-app：`npm run build` 通过
+- source app：`score=97`，关键状态 `home/name/playing/ending` 全部通过
+- root app：`npm run build` 通过
 
 ## 维护约定
 
-1. `mirror/` 是零风险回退线，不要随意修改其内容
-2. 业务迭代优先在 `recovered-app/` 进行
+1. `mirror/` 是回退与对照基线，不做日常功能开发
+2. 日常业务迭代统一在根目录应用进行（`app/`、`components/`、`data/`、`public/`）
 3. 修改结构化资产或源码前，先保留现有验证脚本作为回归基线
 4. 提交前至少运行：
    - `python3 scripts/check_repository.py`
-   - `cd recovered-app && npm run build`
+   - `npm run build`
 
 ## 新增剧本流程
 
-后续新增剧本时，默认只改 `recovered-app/`，**不要修改 `mirror/`**。
-当前首页会从 `recovered-app/data/girls.json` 中随机挑一个角色开局，所以新剧本接入后会自动进入随机池。
+后续新增剧本时，默认改这几个位置：
+
+- `data/girls.json`
+- `data/scenes.json`
+- `data/chapters.json`（如果章节结构变化）
+- `public/` 下的角色图片资源
+
+当前首页会从 `data/girls.json` 中随机挑一个角色开局，所以新剧本接入后会自动进入随机池。
 
 ### 1. 新增角色入口
 
-在 `recovered-app/data/girls.json` 中新增一个角色对象：
+在 `data/girls.json` 中新增一个角色对象：
 
 ```json
 "yue": {
@@ -92,12 +91,12 @@ cd recovered-app && npm run build
 同时把头像资源放到：
 
 ```bash
-recovered-app/public/yue.png
+public/yue.png
 ```
 
 ### 2. 在 `scenes.json` 里补完整剧情树
 
-在 `recovered-app/data/scenes.json` 中新增该角色的剧情节点，建议统一使用独立前缀，例如 `yue_`：
+在 `data/scenes.json` 中新增该角色的剧情节点，建议统一使用独立前缀，例如 `yue_`：
 
 ```json
 {
@@ -151,8 +150,8 @@ recovered-app/public/yue.png
 
 如果不写 `endingData`，而是想复用随机结局池，则还需要同步修改：
 
-- `recovered-app/components/recovered/endingPools.js`
-- `recovered-app/components/recovered/gameEngine.js`
+- `components/chat/endingPools.js`
+- `components/chat/gameEngine.js`
 
 否则新的剧情前缀不会被正确识别，结局会落到默认角色池。
 
@@ -161,7 +160,7 @@ recovered-app/public/yue.png
 如果新剧本不再沿用当前 1~6 章结构，需要同步更新：
 
 ```bash
-recovered-app/data/chapters.json
+data/chapters.json
 ```
 
 否则顶部章节标题仍然会按旧映射显示。
@@ -170,7 +169,7 @@ recovered-app/data/chapters.json
 
 ```bash
 python3 scripts/check_repository.py
-cd recovered-app && npm run build
+npm run build
 ```
 
 然后手动跑一遍新剧本主路径，至少确认：
@@ -182,8 +181,6 @@ cd recovered-app && npm run build
 
 ## 相关文档
 
-- `RECOVERY_REPORT.md`
 - `docs/cleanup-plan.md`
 - `docs/project-roadmap.md`
-- `.omx/plans/prd-chat-simulator-recovery.md`
-- `.omx/plans/test-spec-chat-simulator-recovery.md`
+- `docs/recovery-report.md`

@@ -1,9 +1,9 @@
-import RecoveredChatSimulator from "../recovered-app/components/RecoveredChatSimulator";
+import ChatSimulator from "../components/ChatSimulator";
 
 export default function Page() {
   return (
     <main className="min-h-screen">
-      <RecoveredChatSimulator />
+      <ChatSimulator />
     </main>
   );
 }

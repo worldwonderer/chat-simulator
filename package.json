@@ -1,5 +1,5 @@
 {
-  "name": "chat-simulator-recovery-root-app",
+  "name": "chat-simulator",
   "private": true,
   "scripts": {
     "dev": "next dev",

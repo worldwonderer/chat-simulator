@@ -1,42 +1,32 @@
 # Phase 1 Module Split Plan
 
 ## Goal
-把 `recovered-app/components/RecoveredChatSimulator.jsx` 从单一入口大文件逐步拆成职责清晰的模块，同时保持行为不变、构建不变、视觉结果不退化。
+记录聊天模拟器从单入口大文件向模块化结构演进的阶段性成果。
 
-## Scope
-- 第一刀：拆出入口壳层、屏幕入口层、核心逻辑承载层
-- 第二刀（后续）：从核心逻辑层继续抽出 store / scene engine / ending engine / helpers
+## Current structure
+本阶段已经完成以下边界拆分：
 
-## Current slice
-本次先完成：
-1. `RecoveredChatSimulator.jsx` 保留为轻量入口
-2. 新增 `RecoveredPhoneShell.jsx` 承载手机外壳和通用容器 UI
-3. 新增 `screens/IntroView.jsx`、`screens/PlayingView.jsx`、`screens/EndingView.jsx` 作为独立屏幕入口
-4. 新增 `RecoveredCore.jsx` 暂存原回译逻辑与导出的核心视图/状态
+- `components/ChatSimulator.jsx`：应用入口
+- `components/chat/PhoneShell.jsx`：设备外壳与通用容器
+- `components/chat/screens/*`：各 screen 自包含逻辑
+- `components/chat/ui/*`：可复用 UI 子组件与轻量工具层
+- `components/chat/gameData.js`：数据装配层
+- `components/chat/endingPools.js`：结局池
+- `components/chat/store.js`：状态层
+- `components/chat/gameEngine.js`：场景推进与结局运行时
 
 ## Safety rules
-- 不改剧情数据
-- 不改结局逻辑
+- 不改剧情内容
 - 不改镜像基线
 - 必须重新运行：
   - `python3 scripts/check_repository.py`
-  - `python3 scripts/verify_recovered_source_fidelity.py`
-  - `cd recovered-app && npm run build`
+  - `python3 scripts/verify_source_fidelity.py`
+  - `npm run build`
 
 ## Exit criteria
 - 构建通过
-- 源码高保真验证通过
+- source fidelity 通过
 - 模块边界比单文件入口更清晰
 
-
-## Completed work
-- 已拆出入口层：`RecoveredChatSimulator.jsx`
-- 已拆出外壳层：`RecoveredPhoneShell.jsx`
-- 已拆出屏幕层：`screens/IntroView.jsx`、`screens/PlayingView.jsx`、`screens/EndingView.jsx`
-- 已拆出数据层：`gameData.js`
-- 已拆出结局池：`endingPools.js`
-- 已拆出状态层：`store.js`
-- 已拆出运行时引擎：`gameEngine.js`
-
-## Phase 1 verdict
-Phase 1 已达到当前里程碑：主入口不再承担全部职责，数据 / 状态 / 引擎 / 屏幕已经形成独立模块边界，且构建与高保真验证仍保持通过。
+## Verdict
+本阶段已完成“入口 / 外壳 / screen / UI 子组件 / 数据 / 状态 / 运行时”拆分，screen 逻辑已落入各自文件，后续主要工作转为继续拆分 runtime 和数据组织。
