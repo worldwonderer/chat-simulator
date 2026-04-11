@@ -15,3 +15,7 @@ recovered-app/tsconfig.tsbuildinfo
 .ruff_cache/
 .idea/
 .vscode/
+.vercel
+node_modules/
+.next/
+.vercel/
