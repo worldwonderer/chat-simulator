@@ -27,7 +27,6 @@ REQUIRED_FILES = [
     ROOT / 'scripts' / 'serve_exact_mirror.sh',
     ROOT / 'scripts' / 'verify_fidelity.py',
     ROOT / 'scripts' / 'verify_source_fidelity.py',
-    ROOT / 'docs' / 'cleanup-plan.md',
     ROOT / 'docs' / 'recovery-report.md',
     ROOT / 'mirror' / 'index.html',
 ]

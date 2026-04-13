@@ -1,6 +1,6 @@
 # Recovery Report
 
-> 历史说明：本文件保留 2026-04 恢复阶段的背景与结论，当前正式开发入口已经归一到仓库根目录应用。
+> 历史说明：本文件保留 2026-04 恢复阶段的背景与结论。当前正式开发入口已经归一到仓库根目录应用，因此本文件仅用于历史追溯与基线说明。
 
 ## Historical recovery outputs
 - `mirror/`：恢复期精确镜像基线
@@ -13,6 +13,13 @@
 - `components/chat/screens/*`：正式 screen 逻辑入口
 - `data/`：角色、剧情、章节、话术数据
 - `public/`：正式静态资源
+
+## Archive status
+
+- 本文档：历史归档
+- `docs/recovery/*`：恢复期日志归档
+- `scripts/recovery/*`：恢复期工具归档
+- `mirror/`：仍保留为视觉/行为基线
 
 ## Recovery conclusions retained for reference
 - 原站点技术栈：Next.js App Router + React + Turbopack

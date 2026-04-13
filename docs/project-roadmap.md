@@ -3,6 +3,12 @@
 ## Goal
 把当前项目从“恢复完成”推进到“长期可维护、可安全迭代、可平滑交接”的产品工程。
 
+## Current snapshot
+
+- Phase 0（结构正规化）：**已完成**
+- Phase 1（模块拆分）：**已完成主要收口**
+- 当前主焦点：**Phase 2 回归系统** + **Phase 3 资产自主化**
+
 ## Current posture
 项目现在采用一主一辅两条线：
 
@@ -18,6 +24,9 @@
 **Goal**
 完成从恢复期目录结构到标准单项目结构的收口。
 
+**Status**
+已完成。
+
 **Success criteria**
 - 根目录是唯一正式应用入口
 - README、CI、验证脚本都基于根目录工作流
@@ -26,6 +35,9 @@
 ## Phase 1 — Make the source app maintainable
 **Goal**
 继续把聊天模拟器源码从“可运行”推进到“可读、可测、可改”。
+
+**Status**
+主要边界拆分已完成；后续仅保留渐进式优化。
 
 **Target architecture**
 ```text
@@ -53,6 +65,9 @@
 **Goal**
 把“能跑”升级为“能长期改”。
 
+**Status**
+当前优先级最高。
+
 **Action items**
 - 增加最小 E2E 主路径验证
 - 把结构检查、构建检查和 fidelity 校验接入 CI
@@ -65,6 +80,9 @@
 ## Phase 3 — Own the assets
 **Goal**
 逐步减少对恢复期镜像资产的依赖。
+
+**Status**
+尚未系统推进。
 
 **Action items**
 - 盘点 `public/mirror-static/` 中哪些资源应保留、替换或重建
@@ -87,6 +105,6 @@
 - **回退策略**：核心路径变更必须保留与 `mirror/` 的可比对能力
 
 ## Immediate next 3 tasks
-1. 继续拆分 `gameEngine.js` 与 `endingPools.js`
-2. 增加最小 E2E 与 PR 校验入口
-3. 设计更适合运营的剧情配置/编辑流程
+1. 增加最小 E2E 与 PR 校验入口
+2. 盘点 `public/mirror-static/` 并建立资产来源记录
+3. 设计更适合运营的剧情配置 / 编辑流程

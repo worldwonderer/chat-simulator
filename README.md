@@ -1,8 +1,20 @@
 # chat-simulator
 
-一个已经整理成标准单项目结构的聊天模拟器仓库。
+一个基于 Next.js 的互动式聊天剧情模拟器项目。
 
-当前根目录就是唯一正式应用入口；`mirror/`、`extracted/` 和恢复报告仅作为历史基线与取证材料保留，不再是日常开发主路径。
+项目已经完成从恢复工程到标准单项目结构的收口：根目录是唯一正式应用入口；`mirror/`、`extracted/` 和恢复报告仅作为历史基线与归档材料保留。
+
+## 当前状态
+
+- ✅ 单项目结构已完成
+- ✅ screen / UI / store / runtime 已完成模块化
+- ✅ mirror fidelity 与 source fidelity 校验可持续运行
+- 🔜 当前主要迭代方向：E2E 回归、剧情编辑流程、资产自主化
+
+## 在线地址
+
+- 生产域名：<https://chat.vibecoco.ai>
+- Vercel 地址：<https://chat-vibecoco-ai.vercel.app>
 
 ## 仓库结构
 
@@ -15,7 +27,9 @@
 ├── data/                    # 正式业务数据（剧情/角色/章节/话术）
 ├── public/                  # 正式静态资源
 ├── scripts/                 # 启动/验证脚本
+│   └── recovery/            # 恢复期辅助脚本（归档）
 ├── docs/                    # 项目文档与历史资料
+│   └── recovery/            # 恢复期日志与取证记录
 ├── mirror/                  # 恢复期精确镜像基线
 ├── extracted/               # 恢复期抽取资产
 └── output/playwright/       # 截图验证证据
@@ -52,6 +66,12 @@ npm run build
 - exact mirror：`score=100`，关键状态 `home/name/playing/ending` 全部通过
 - source app：`score=97`，关键状态 `home/name/playing/ending` 全部通过
 - root app：`npm run build` 通过
+
+## 当前开发边界
+
+- **日常开发目录**：`app/`、`components/`、`data/`、`public/`
+- **回归基线目录**：`mirror/`
+- **历史归档目录**：`extracted/`、`docs/recovery/`、`scripts/recovery/`
 
 ## 维护约定
 
@@ -181,6 +201,5 @@ npm run build
 
 ## 相关文档
 
-- `docs/cleanup-plan.md`
 - `docs/project-roadmap.md`
 - `docs/recovery-report.md`
