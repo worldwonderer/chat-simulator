@@ -2,13 +2,13 @@
 
 一个基于 Next.js 的互动式聊天剧情模拟器项目。
 
-项目已经完成从恢复工程到标准单项目结构的收口：根目录是唯一正式应用入口；`mirror/`、`extracted/` 和恢复报告仅作为历史基线与归档材料保留。
+项目已经完成结构正规化：根目录是唯一正式应用入口，仓库只保留当前产品代码、数据、静态资源和通用视觉基线。
 
 ## 当前状态
 
 - ✅ 单项目结构已完成
 - ✅ screen / UI / store / runtime 已完成模块化
-- ✅ mirror fidelity 与 source fidelity 校验可持续运行
+- ✅ 视觉基线校验可持续运行
 - 🔜 当前主要迭代方向：E2E 回归、剧情编辑流程、资产自主化
 
 ## 在线地址
@@ -27,12 +27,8 @@
 ├── data/                    # 正式业务数据（剧情/角色/章节/话术）
 ├── public/                  # 正式静态资源
 ├── scripts/                 # 启动/验证脚本
-│   └── recovery/            # 恢复期辅助脚本（归档）
-├── docs/                    # 项目文档与历史资料
-│   └── recovery/            # 恢复期日志与取证记录
-├── mirror/                  # 恢复期精确镜像基线
-├── extracted/               # 恢复期抽取资产
-└── output/playwright/       # 截图验证证据
+├── docs/                    # 项目文档
+└── output/visual-baseline/  # 视觉基线截图
 ```
 
 ## 快速开始
@@ -51,11 +47,8 @@ npm run start -- --port 4180
 # 仓库结构与数据链路检查
 python3 scripts/check_repository.py
 
-# 精确镜像高保真校验
-python3 scripts/verify_fidelity.py
-
-# 正式应用高保真校验
-python3 scripts/verify_source_fidelity.py
+# 视觉基线校验
+python3 scripts/verify_visual_baseline.py
 
 # 应用构建
 npm run build
@@ -63,23 +56,22 @@ npm run build
 
 ## 当前验证结论
 
-- exact mirror：`score=100`，关键状态 `home/name/playing/ending` 全部通过
-- source app：`score=97`，关键状态 `home/name/playing/ending` 全部通过
+- visual baseline：`score=97`，关键状态 `home/name/playing/ending` 全部通过
 - root app：`npm run build` 通过
 
 ## 当前开发边界
 
 - **日常开发目录**：`app/`、`components/`、`data/`、`public/`
-- **回归基线目录**：`mirror/`
-- **历史归档目录**：`extracted/`、`docs/recovery/`、`scripts/recovery/`
+- **视觉基线目录**：`output/visual-baseline/`
 
 ## 维护约定
 
-1. `mirror/` 是回退与对照基线，不做日常功能开发
+1. `output/visual-baseline/` 用于界面回归对照，不作为运行时代码路径
 2. 日常业务迭代统一在根目录应用进行（`app/`、`components/`、`data/`、`public/`）
 3. 修改结构化资产或源码前，先保留现有验证脚本作为回归基线
 4. 提交前至少运行：
    - `python3 scripts/check_repository.py`
+   - `python3 scripts/verify_visual_baseline.py`
    - `npm run build`
 
 ## 新增剧本流程
@@ -202,4 +194,3 @@ npm run build
 ## 相关文档
 
 - `docs/project-roadmap.md`
-- `docs/recovery-report.md`

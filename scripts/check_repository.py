@@ -24,11 +24,9 @@ REQUIRED_FILES = [
     ROOT / 'data' / 'chapters.json',
     ROOT / 'data' / 'scenes.json',
     ROOT / 'data' / 'tactics.json',
-    ROOT / 'scripts' / 'serve_exact_mirror.sh',
-    ROOT / 'scripts' / 'verify_fidelity.py',
-    ROOT / 'scripts' / 'verify_source_fidelity.py',
-    ROOT / 'docs' / 'recovery-report.md',
-    ROOT / 'mirror' / 'index.html',
+    ROOT / 'scripts' / 'verify_visual_baseline.py',
+    ROOT / 'public' / 'static-assets' / 'chunks' / '0x.pxwmy6tt~x.css',
+    ROOT / 'public' / 'static-assets' / 'chunks' / '0h7l~nyi9rz9m.css',
 ]
 
 for path in REQUIRED_FILES:

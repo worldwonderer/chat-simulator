@@ -5,23 +5,23 @@ import json
 from pathlib import Path
 from PIL import Image, ImageChops
 
-ROOT = Path(__file__).resolve().parents[1] / 'output' / 'playwright'
+ROOT = Path(__file__).resolve().parents[1] / 'output' / 'visual-baseline'
 PAIRS = [
-    ('local-home.png', 'source-home.png', 'home'),
-    ('local-name.png', 'source-name.png', 'name'),
-    ('local-playing-fresh.png', 'source-playing.png', 'playing'),
-    ('local-ending-fresh.png', 'source-ending.png', 'ending'),
+    ('current-home.png', 'baseline-home.png', 'home'),
+    ('current-name.png', 'baseline-name.png', 'name'),
+    ('current-playing.png', 'baseline-playing.png', 'playing'),
+    ('current-ending.png', 'baseline-ending.png', 'ending'),
 ]
 results = []
-for local_name, source_name, label in PAIRS:
-    local = Image.open(ROOT / local_name).convert('RGB')
-    source = Image.open(ROOT / source_name).convert('RGB')
-    if local.size != source.size:
-        raise SystemExit(f'size mismatch for {label}: {local.size} vs {source.size}')
-    diff = ImageChops.difference(local, source)
+for current_name, baseline_name, label in PAIRS:
+    current = Image.open(ROOT / current_name).convert('RGB')
+    baseline = Image.open(ROOT / baseline_name).convert('RGB')
+    if current.size != baseline.size:
+        raise SystemExit(f'size mismatch for {label}: {current.size} vs {baseline.size}')
+    diff = ImageChops.difference(current, baseline)
     bbox = diff.getbbox()
     hist = diff.histogram()
-    pixels = local.width * local.height
+    pixels = current.width * current.height
     channels = 3
     sum_abs = 0
     nonzero = 0
@@ -49,9 +49,9 @@ verdict = {
     'score': score,
     'verdict': 'pass' if all_pass else 'revise',
     'category_match': True,
-    'differences': [] if all_pass else ['Source app still diverges from the local mirror beyond threshold on at least one checked state.'],
+    'differences': [] if all_pass else ['Current app render still diverges from the stored visual baseline beyond threshold on at least one checked state.'],
     'suggestions': [] if all_pass else ['Tighten source parity in the listed screens and rerun screenshot diff.'],
-    'reasoning': 'Source app is visually indistinguishable from the local mirror on checked states within strict diff thresholds.' if all_pass else 'Source app still needs visual parity work.',
+    'reasoning': 'Current app output is visually indistinguishable from the stored baseline on checked states within strict diff thresholds.' if all_pass else 'Current app output still needs visual parity work.',
     'results': results,
 }
 print(json.dumps(verdict, ensure_ascii=False, indent=2))

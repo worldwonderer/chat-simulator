@@ -18,4 +18,3 @@ node_modules/
 .next/
 .vercel/
 .omx/
-docs/recovery/*.json
