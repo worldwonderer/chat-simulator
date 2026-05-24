@@ -90,7 +90,7 @@
 
 ## Decision rules
 - **开发优先级**：默认修改根目录应用
-- **对照基线**：需要视觉对照时使用 `output/visual-baseline/`
+- **对照基线**：需要视觉对照时使用 `docs/screenshots/` 中的提交截图作为视觉基线，本地 current 截图仍生成到 `output/visual-baseline/`
 - **回退策略**：核心路径变更必须保留可复验的视觉基线与结构校验
 
 ## Immediate next 3 tasks

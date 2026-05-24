@@ -55,7 +55,8 @@ The repository keeps source, story data, public assets, and baseline screenshots
 - `node_modules/`
 - `.next/`
 - `.env*` except `.env.example`
-- `output/visual-baseline/current-*.png`
+- `docs/screenshots/` committed README screenshots
+- `output/visual-baseline/current-*.png` generated local comparison screenshots
 - `output/visual-current/`
 
 Current screenshots can be regenerated locally for strict pixel diffs; they are not committed.

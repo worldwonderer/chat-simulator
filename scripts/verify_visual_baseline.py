@@ -6,13 +6,15 @@ import struct
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1] / 'output' / 'visual-baseline'
+ROOT = Path(__file__).resolve().parents[1]
+BASELINE_ROOT = ROOT / 'docs' / 'screenshots'
+CURRENT_ROOT = ROOT / 'output' / 'visual-baseline'
 PNG_SIGNATURE = b'\x89PNG\r\n\x1a\n'
 PAIRS = [
-    ('current-home.png', 'baseline-home.png', 'home'),
-    ('current-name.png', 'baseline-name.png', 'name'),
-    ('current-playing.png', 'baseline-playing.png', 'playing'),
-    ('current-ending.png', 'baseline-ending.png', 'ending'),
+    ('current-home.png', 'home.png', 'home'),
+    ('current-name.png', 'name.png', 'name'),
+    ('current-playing.png', 'playing.png', 'playing'),
+    ('current-ending.png', 'ending.png', 'ending'),
 ]
 
 
@@ -48,8 +50,8 @@ missing_current = []
 pillow_modules = None
 
 for current_name, baseline_name, label in PAIRS:
-    baseline_path = ROOT / baseline_name
-    current_path = ROOT / current_name
+    baseline_path = BASELINE_ROOT / baseline_name
+    current_path = CURRENT_ROOT / current_name
 
     if not baseline_path.exists():
         raise SystemExit(f'missing visual baseline for {label}: {baseline_path}')
@@ -113,7 +115,7 @@ verdict = {
     'mode': 'diff' if has_diff_mode else 'baseline-integrity',
     'differences': [] if all_pass else ['Current app render still diverges from the stored visual baseline beyond threshold on at least one checked state.'],
     'suggestions': [] if has_diff_mode else ['Generate local current-*.png screenshots before running this script for strict pixel diffs. Current screenshots are intentionally not committed to keep clone size small.'],
-    'reasoning': 'Checked current screenshots against the stored baseline within strict diff thresholds.' if has_diff_mode else 'Stored visual baselines are present and readable; current generated screenshots are intentionally excluded from git.',
+    'reasoning': 'Checked current screenshots against the stored baseline within strict diff thresholds.' if has_diff_mode else 'Stored documentation screenshots are present and readable; current generated screenshots are intentionally excluded from git.',
     'missing_current': missing_current,
     'results': results,
 }

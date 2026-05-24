@@ -34,5 +34,5 @@ npm audit --omit=dev
 - Keep the mobile chat UI/UX visually stable unless the issue explicitly requests UI work.
 - Route all DeepSeek calls through `/api/ai/chat`; frontend code must never import server AI helpers or read DeepSeek keys.
 - Preserve scripted story flow. AI text should be anchored to `targetLine` and fall back to original script text on failure.
-- Keep clone size small: do not commit `.next/`, `node_modules/`, `output/visual-baseline/current-*.png`, or ad-hoc generated assets.
+- Keep clone size small: do not commit `.next/`, `node_modules/`, `output/visual-baseline/current-*.png`, or ad-hoc generated assets. Reuse the compressed screenshots in `docs/screenshots/` for README visuals.
 - Add story data through `data/girls.json`, `data/scenes.json`, and `public/` assets, then run repository checks.
