@@ -189,12 +189,18 @@ if not isinstance(summary, dict):
 if not isinstance(tactics, list) or not tactics:
     raise SystemExit('tactics.json must be a non-empty array')
 
+tactic_names = [tactic.get('name') for tactic in tactics if isinstance(tactic, dict)]
+if len(tactic_names) != len(set(tactic_names)):
+    raise SystemExit('tactics.json must not contain duplicate tactic names')
+tactic_name_set = set(tactic_names)
+
 scene_ids = {scene['id'] for scene in scenes}
 missing_public_assets: list[str] = []
 missing_scene_links: list[str] = []
 implicit_silent_choices: list[str] = []
 bad_public_image_types: list[str] = []
 scenes_with_time_messages_missing_labels: list[str] = []
+unknown_scene_tactics: list[str] = []
 
 
 def public_image_type(path: Path) -> str:
@@ -239,6 +245,10 @@ for scene in scenes:
     if any(str(message.get('content', '')).startswith('[TIME]') for message in scene.get('messages', [])) and not scene.get('timeLabel'):
         scenes_with_time_messages_missing_labels.append(scene['id'])
 
+    scene_tactic = scene.get('puaTacticUsed')
+    if scene_tactic and scene_tactic not in tactic_name_set:
+        unknown_scene_tactics.append(f"{scene['id']} -> {scene_tactic}")
+
     auto_next = scene.get('autoNext')
     if auto_next and auto_next not in scene_ids:
         missing_scene_links.append(f"{scene['id']}.autoNext -> {auto_next}")
@@ -274,6 +284,10 @@ if implicit_silent_choices:
 if scenes_with_time_messages_missing_labels:
     preview = ', '.join(scenes_with_time_messages_missing_labels[:10])
     raise SystemExit(f'Scenes with [TIME] messages must set timeLabel for the status bar ({len(scenes_with_time_messages_missing_labels)}): {preview}')
+
+if unknown_scene_tactics:
+    preview = '; '.join(unknown_scene_tactics[:10])
+    raise SystemExit(f'Scene puaTacticUsed values must exist in tactics.json ({len(unknown_scene_tactics)}): {preview}')
 
 print('Repository structure check: PASS')
 print(
