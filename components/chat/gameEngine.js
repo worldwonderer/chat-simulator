@@ -56,14 +56,14 @@ function resolveEnding(scene) {
 export async function runScene(scene, token) {
   if (token !== runToken) return;
 
-  useGameStore.setState({
+  useGameStore.setState((state) => ({
     currentSceneId: scene.id,
     chapter: scene.chapter,
-    timeLabel: scene.timeLabel ?? "",
+    timeLabel: scene.timeLabel ?? state.timeLabel,
     showChoices: false,
     currentChoices: [],
     lastChoiceBadge: null,
-  });
+  }));
 
   const messages = scene.messages ?? [];
   if (messages.length === 0) {

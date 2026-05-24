@@ -62,6 +62,7 @@ env_example = (ROOT / '.env.example').read_text()
 deepseek_source = (ROOT / 'lib' / 'ai' / 'deepseek.js').read_text()
 route_source = (ROOT / 'app' / 'api' / 'ai' / 'chat' / 'route.js').read_text()
 client_ai_source = (ROOT / 'components' / 'chat' / 'aiDialogue.js').read_text()
+game_engine_source = (ROOT / 'components' / 'chat' / 'gameEngine.js').read_text()
 intro_source = (ROOT / 'components' / 'chat' / 'screens' / 'IntroView.jsx').read_text()
 playing_source = (ROOT / 'components' / 'chat' / 'screens' / 'PlayingView.jsx').read_text()
 phone_shell_source = (ROOT / 'components' / 'chat' / 'PhoneShell.jsx').read_text()
@@ -158,6 +159,8 @@ if "localStorage.getItem('LAST_PLAYED_GIRL')" in intro_source or "localStorage.s
     raise SystemExit('Intro start flow must not directly call localStorage with string keys')
 if 'timeLabel,' not in playing_source or '<StatusBar time={timeLabel} />' not in playing_source:
     raise SystemExit('Playing view must pass scene timeLabel into StatusBar instead of showing only real clock time')
+if 'timeLabel: scene.timeLabel ?? state.timeLabel' not in game_engine_source or 'timeLabel: scene.timeLabel ?? ""' in game_engine_source:
+    raise SystemExit('Untimed continuation scenes must inherit the previous scripted timeLabel instead of falling back to wall-clock time')
 if '<button' in conversation_header_source:
     raise SystemExit('Conversation header decorative chrome must not render focusable no-op buttons')
 if '<button className="p-1.5 rounded-md active:bg-black/10">' in playing_source or playing_source.count('aria-hidden="true" className="p-1.5 rounded-md"') < 3:
