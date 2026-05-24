@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useGameStore } from '../store';
 import { useGameActions } from '../gameEngine';
 import ChoicePanel from '../ui/ChoicePanel';
@@ -31,31 +31,44 @@ export default function PlayingView() {
   const autoScrollEnabledRef = useRef(true);
 
   const handleScroll = useCallback(() => {
+    if (showChoices) {
+      autoScrollEnabledRef.current = true;
+      setShowNewMessageNotice(false);
+      return;
+    }
+
     const container = scrollContainerRef.current;
     if (!container) return;
 
     const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
     autoScrollEnabledRef.current = distanceFromBottom < 80;
     setShowNewMessageNotice(distanceFromBottom > 120);
-  }, []);
+  }, [showChoices]);
 
   useEffect(() => {
+    if (showChoices) return;
+
     if (autoScrollEnabledRef.current) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
       setShowNewMessageNotice(false);
     } else {
       setShowNewMessageNotice(true);
     }
-  }, [visibleMessages, isTyping]);
+  }, [visibleMessages, isTyping, showChoices]);
 
-  useEffect(() => {
-    if (showChoices) {
-      setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-        setShowNewMessageNotice(false);
-      }, 50);
+  useLayoutEffect(() => {
+    if (!showChoices) return;
+
+    const container = scrollContainerRef.current;
+    autoScrollEnabledRef.current = true;
+    setShowNewMessageNotice(false);
+
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    } else {
+      bottomRef.current?.scrollIntoView({ behavior: 'auto' });
     }
-  }, [showChoices]);
+  }, [showChoices, currentChoices.length]);
 
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -96,7 +109,7 @@ export default function PlayingView() {
       )}
 
       {showChoices ? (
-        <div className="shrink-0 animate-slide-up">
+        <div className="shrink-0 animate-slide-up" style={{ willChange: 'transform, opacity' }}>
           <ChoicePanel choices={currentChoices} onSelect={handleSelectChoice} />
         </div>
       ) : (
