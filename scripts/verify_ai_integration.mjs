@@ -91,6 +91,25 @@ if (captured.authHeader !== 'Bearer test-key') {
   throw new Error('DeepSeek authorization header was not derived from DEEPSEEK_API_KEY');
 }
 
+process.env.DEEPSEEK_MODEL = '   ';
+let whitespaceModelCapture;
+globalThis.fetch = async (url, options) => {
+  whitespaceModelCapture = JSON.parse(options.body).model;
+  return new Response(JSON.stringify({ choices: [{ message: { content: '好的，我知道啦。' } }] }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  });
+};
+const { DEEPSEEK_MODEL: fallbackModel, createDeepSeekChatCompletion: createChatCompletionWithFallbackModel } = await import(`../lib/ai/deepseek.js?whitespace-model=${Date.now()}`);
+const fallbackModelResult = await createChatCompletionWithFallbackModel(validPayload);
+
+if (fallbackModel !== 'deepseek-v4-flash' || whitespaceModelCapture !== 'deepseek-v4-flash' || fallbackModelResult.model !== 'deepseek-v4-flash') {
+  throw new Error(`whitespace-only DEEPSEEK_MODEL must fall back to the default model: ${JSON.stringify({ fallbackModel, whitespaceModelCapture, resultModel: fallbackModelResult.model })}`);
+}
+
+process.env.DEEPSEEK_MODEL = 'deepseek-v4-flash';
+globalThis.fetch = mockDeepSeekFetch;
+
 process.env.DEEPSEEK_API_KEY = '   ';
 const whitespaceKeyResponse = await POST(buildRequest(validPayload));
 const whitespaceKeyData = await whitespaceKeyResponse.json();

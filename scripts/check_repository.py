@@ -138,6 +138,8 @@ if 'sk-' in env_example:
     raise SystemExit('.env.example must not contain a real API key')
 if 'deepseek-v4-flash' not in deepseek_source:
     raise SystemExit('DeepSeek client must default to deepseek-v4-flash')
+if 'readStringEnv("DEEPSEEK_MODEL", DEFAULT_DEEPSEEK_MODEL)' not in deepseek_source or 'process.env.DEEPSEEK_MODEL ||' in deepseek_source:
+    raise SystemExit('DeepSeek model env must trim blank values before falling back to the default model')
 if 'https://api.deepseek.com' not in deepseek_source or 'chat/completions' not in deepseek_source:
     raise SystemExit('DeepSeek client must target the OpenAI-compatible DeepSeek chat completions endpoint')
 if 'thinking: { type: "disabled" }' not in deepseek_source:
@@ -168,6 +170,8 @@ if 'unoptimized,' not in image_shim_source or 'placeholder,' not in image_shim_s
     raise SystemExit('ImageShim must consume Next/Image-only props before spreading native img props')
 if 'deepseek-v4-flash' not in ai_verify_source or 'https://api.deepseek.com/chat/completions' not in ai_verify_source:
     raise SystemExit('AI integration verifier must assert the DeepSeek model and endpoint')
+if "process.env.DEEPSEEK_MODEL = '   '" not in ai_verify_source or 'whitespace-only DEEPSEEK_MODEL must fall back' not in ai_verify_source:
+    raise SystemExit('AI integration verifier must assert whitespace-only DEEPSEEK_MODEL falls back to the default')
 if "thinkingType !== 'disabled'" not in ai_verify_source:
     raise SystemExit('AI integration verifier must assert disabled thinking mode')
 
