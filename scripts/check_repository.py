@@ -182,6 +182,8 @@ if 'deepseek-v4-flash' not in ai_verify_source or 'https://api.deepseek.com/chat
     raise SystemExit('AI integration verifier must assert the DeepSeek model and endpoint')
 if 'unwrapJsonContent' not in deepseek_source or 'JSON-shaped AI replies should be unwrapped before display' not in ai_verify_source:
     raise SystemExit('AI response normalization must unwrap JSON-shaped provider replies before display')
+if 'Bracket-prefixed chat text should not be rejected as JSON' not in ai_verify_source or 'content.startsWith("[")' not in deepseek_source:
+    raise SystemExit('AI response normalization must distinguish bracket-prefixed chat text from parseable JSON arrays')
 if "process.env.DEEPSEEK_MODEL = '   '" not in ai_verify_source or 'whitespace-only DEEPSEEK_MODEL must fall back' not in ai_verify_source:
     raise SystemExit('AI integration verifier must assert whitespace-only DEEPSEEK_MODEL falls back to the default')
 if "thinkingType !== 'disabled'" not in ai_verify_source:

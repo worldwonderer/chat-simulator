@@ -186,6 +186,22 @@ if (jsonShapedResponse.status !== 200 || jsonShapedData.content !== '别想太�
   throw new Error(`JSON-shaped AI replies should be unwrapped before display: ${JSON.stringify({ status: jsonShapedResponse.status, jsonShapedData })}`);
 }
 
+nextMockContent = '[捂脸]我不是那个意思啦。';
+const bracketPrefixedResponse = await POST(buildRequest(validPayload));
+const bracketPrefixedData = await bracketPrefixedResponse.json();
+
+if (bracketPrefixedResponse.status !== 200 || bracketPrefixedData.content !== '[捂脸]我不是那个意思啦。') {
+  throw new Error(`Bracket-prefixed chat text should not be rejected as JSON: ${JSON.stringify({ status: bracketPrefixedResponse.status, bracketPrefixedData })}`);
+}
+
+nextMockContent = '["debug"]';
+const jsonArrayResponse = await POST(buildRequest(validPayload));
+const jsonArrayData = await jsonArrayResponse.json();
+
+if (jsonArrayResponse.status !== 502 || jsonArrayData.error !== 'empty_ai_content') {
+  throw new Error(`Parseable JSON arrays should be rejected instead of displayed: ${JSON.stringify({ status: jsonArrayResponse.status, jsonArrayData })}`);
+}
+
 nextMockContent = '{"debug":true}';
 const invalidJsonShapedResponse = await POST(buildRequest(validPayload));
 const invalidJsonShapedData = await invalidJsonShapedResponse.json();
@@ -354,6 +370,7 @@ console.log(JSON.stringify({
   blocked_origin_error: blockedOriginData.error,
   oversized_error: oversizedData.error,
   json_shaped_content: jsonShapedData.content,
+  bracket_prefixed_content: bracketPrefixedData.content,
   overlong_error: overlongData.error,
   max_tokens: captured.maxTokens,
   inherited_time_label: clientAiPayload.scene.timeLabel,
