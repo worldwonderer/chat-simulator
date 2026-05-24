@@ -40,6 +40,7 @@ REQUIRED_FILES = [
     ROOT / 'data' / 'girls.json',
     ROOT / 'data' / 'chapters.json',
     ROOT / 'data' / 'scenes.json',
+    ROOT / 'data' / 'summary.json',
     ROOT / 'data' / 'tactics.json',
     ROOT / 'scripts' / 'verify_visual_baseline.py',
     ROOT / 'scripts' / 'verify_ai_integration.mjs',
@@ -54,6 +55,7 @@ for path in REQUIRED_FILES:
 girls = json.loads((ROOT / 'data' / 'girls.json').read_text())
 chapters = json.loads((ROOT / 'data' / 'chapters.json').read_text())
 scenes = json.loads((ROOT / 'data' / 'scenes.json').read_text())
+summary = json.loads((ROOT / 'data' / 'summary.json').read_text())
 tactics = json.loads((ROOT / 'data' / 'tactics.json').read_text())
 
 env_example = (ROOT / '.env.example').read_text()
@@ -164,6 +166,8 @@ if not isinstance(chapters, dict) or not chapters:
     raise SystemExit('chapters.json must be a non-empty object')
 if not isinstance(scenes, list) or not scenes:
     raise SystemExit('scenes.json must be a non-empty array')
+if not isinstance(summary, dict):
+    raise SystemExit('summary.json must be an object')
 if not isinstance(tactics, list) or not tactics:
     raise SystemExit('tactics.json must be a non-empty array')
 
@@ -171,6 +175,34 @@ scene_ids = {scene['id'] for scene in scenes}
 missing_public_assets: list[str] = []
 missing_scene_links: list[str] = []
 implicit_silent_choices: list[str] = []
+bad_public_image_types: list[str] = []
+
+
+def public_image_type(path: Path) -> str:
+    header = path.read_bytes()[:12]
+    if header.startswith(b'\x89PNG\r\n\x1a\n'):
+        return 'png'
+    if header.startswith(b'\xff\xd8\xff'):
+        return 'jpg'
+    if header.startswith(b'\x00\x00\x01\x00'):
+        return 'ico'
+    return 'unknown'
+
+
+for public_path in PUBLIC_ROOT.iterdir():
+    if not public_path.is_file():
+        continue
+    suffix = public_path.suffix.lower()
+    if suffix not in {'.png', '.jpg', '.jpeg', '.ico'}:
+        continue
+    detected_type = public_image_type(public_path)
+    expected_type = 'jpg' if suffix in {'.jpg', '.jpeg'} else suffix.lstrip('.')
+    if detected_type != expected_type:
+        bad_public_image_types.append(f'{public_path.relative_to(ROOT)} is {detected_type}, expected {expected_type}')
+
+for asset_path in summary.get('asset_paths', []):
+    if isinstance(asset_path, str) and asset_path.startswith('/') and not (PUBLIC_ROOT / asset_path.lstrip('/')).exists():
+        missing_public_assets.append(asset_path)
 
 for girl_id, girl in girls.items():
     avatar = girl.get('avatar', '')
@@ -205,6 +237,9 @@ for scene in scenes:
 
 if missing_public_assets:
     raise SystemExit('Missing public assets: ' + ', '.join(sorted(set(missing_public_assets))))
+
+if bad_public_image_types:
+    raise SystemExit('Public image extensions must match file signatures: ' + '; '.join(bad_public_image_types))
 
 if missing_scene_links:
     preview = ', '.join(missing_scene_links[:10])

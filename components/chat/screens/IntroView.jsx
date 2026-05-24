@@ -64,7 +64,7 @@ export default function IntroView() {
         <div className="w-full max-w-sm flex flex-col items-center gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex flex-col items-center gap-3">
             <div className="relative">
-              <ImageShim src="/avatar-girl.png" alt="游戏角色" width={90} height={90} className="rounded-2xl object-cover shadow-xl ring-4 ring-white" />
+              <ImageShim src="/avatar-girl-intro.jpg" alt="游戏角色" width={90} height={90} className="rounded-2xl object-cover shadow-xl ring-4 ring-white" />
               <span className="absolute -top-2 -right-2 text-white text-[16px] font-bold rounded-full px-1.5 py-0.5">❤️</span>
             </div>
 
