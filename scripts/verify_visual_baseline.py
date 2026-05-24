@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 BASELINE_ROOT = ROOT / 'docs' / 'screenshots'
 CURRENT_ROOT = ROOT / 'output' / 'visual-baseline'
 PNG_SIGNATURE = b'\x89PNG\r\n\x1a\n'
+FULL_PAGE_SCREENSHOT_SIZE = (1280, 1600)
+README_SCREEN_CROP_BOX = (446, 400, 834, 1180)
 PAIRS = [
     ('current-home.png', 'home.png', 'home'),
     ('current-name.png', 'name.png', 'name'),
@@ -76,6 +78,11 @@ for current_name, baseline_name, label in PAIRS:
 
     baseline = Image.open(baseline_path).convert('RGB')
     current = Image.open(current_path).convert('RGB')
+    normalized_current = False
+    if current.size != baseline.size and current.size == FULL_PAGE_SCREENSHOT_SIZE:
+        current = current.crop(README_SCREEN_CROP_BOX)
+        normalized_current = True
+
     if current.size != baseline.size:
         raise SystemExit(f'size mismatch for {label}: {current.size} vs {baseline.size}')
 
@@ -95,18 +102,18 @@ for current_name, baseline_name, label in PAIRS:
     nonzero_ratio = nonzero / (pixels * channels)
     passed = mean_abs < 0.05 and nonzero_ratio < 0.01
     results.append(
-        {
-            'screen': label,
-            'mode': 'diff',
-            'bbox': bbox,
-            'mean_abs': round(mean_abs, 6),
+            {
+                'screen': label,
+                'mode': 'diff-normalized' if normalized_current else 'diff',
+                'bbox': bbox,
+                'mean_abs': round(mean_abs, 6),
             'nonzero_ratio': round(nonzero_ratio, 6),
             'pass': passed,
         }
     )
 
 all_pass = all(item['pass'] for item in results)
-has_diff_mode = any(item['mode'] == 'diff' for item in results)
+has_diff_mode = any(item['mode'].startswith('diff') for item in results)
 score = 97 if all_pass and has_diff_mode else 95 if all_pass else 82
 verdict = {
     'score': score,

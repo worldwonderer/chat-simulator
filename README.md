@@ -1,79 +1,90 @@
-# chat-simulator
+# chat-simulator：中文聊天剧情模拟器
 
-一个生产可部署的 Next.js 互动式中文聊天剧情模拟器。前端保持微信聊天式 UI，后端通过 Next.js API Route 代理 DeepSeek，让浏览器永远不直接接触 DeepSeek API Key。
+一个可生产部署的互动式中文聊天剧情模拟器。前端提供接近即时通讯软件的移动端聊天体验，后端通过 Next.js 接口路由代理 DeepSeek 请求，浏览器不会直接接触 DeepSeek 密钥。
 
-- Demo: <https://chat.vibecoco.ai/>
-- License: MIT
-- AI model: `deepseek-v4-flash`
+- 在线演示：<https://chat.vibecoco.ai/>
+- 开源协议：MIT
+- 使用模型：`deepseek-v4-flash`
 
-## Screenshots
+## 项目截图
 
-| Home | Name setup |
-| --- | --- |
-| ![Home screen](docs/screenshots/home.png) | ![Name setup screen](docs/screenshots/name.png) |
+<table>
+  <tr>
+    <th>首页</th>
+    <th>取名页</th>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/home.png" alt="首页截图" width="260"></td>
+    <td><img src="docs/screenshots/name.png" alt="取名页截图" width="260"></td>
+  </tr>
+  <tr>
+    <th>聊天玩法</th>
+    <th>结局页</th>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/playing.png" alt="聊天玩法截图" width="260"></td>
+    <td><img src="docs/screenshots/ending.png" alt="结局页截图" width="260"></td>
+  </tr>
+</table>
 
-| Chat gameplay | Ending summary |
-| --- | --- |
-| ![Chat gameplay screen](docs/screenshots/playing.png) | ![Ending summary screen](docs/screenshots/ending.png) |
+## 项目状态
 
-## Project status
+- 单个 Next.js 应用，仓库根目录就是生产入口。
+- 移动端聊天界面、剧情引擎、状态管理和结构化剧情数据已模块化。
+- 后端 `/api/ai/chat` 封装 DeepSeek 请求，生产环境不会把密钥暴露给浏览器。
+- 生成回复会注入当前角色人设、剧情节点、目标台词、最近上下文、选项历史和玩家自定义姓名，并以原剧本台词作为剧情锚点。
+- 生成请求失败或超时时，会回退到原剧本台词，保证剧情流程不中断。
+- 已包含网站图标、应用图标、苹果触摸图标、MIT 协议、贡献说明、安全说明和生产部署文档。
+- 项目首页截图只保留压缩后的手机主体图，生成过程中的临时截图不提交，避免仓库体积失控。
 
-- Single Next.js app; the repository root is the production entry point.
-- Mobile chat UI, story engine, state management, and structured story data are modularized.
-- Backend `/api/ai/chat` wraps DeepSeek requests so production never exposes the API key to the browser.
-- AI replies use the original script line as a plot anchor and fall back to the script line on failure or timeout.
-- Favicon, app icon, and Apple touch icon are included.
-- MIT License, contribution notes, security notes, and production deployment docs are included.
-- Documentation screenshots are committed once under `docs/screenshots/`; generated current screenshots stay out of git to keep clone size controlled.
+## 部署方式
 
-## Deployment
+Vercel 项目 `chat-vibecoco-ai` 已连接 GitHub 仓库 `worldwonderer/chat-simulator`。向 `main` 分支推送代码后，会自动触发生产部署。Next.js 页面和 `app/api/*` 后端接口会在同一次 Vercel 构建中发布。
 
-Vercel project `chat-vibecoco-ai` is connected to GitHub repository `worldwonderer/chat-simulator`. Pushing to the `main` branch triggers a production deployment automatically. Next.js pages and `app/api/*` backend routes are published in the same Vercel build.
-
-## Architecture
+## 架构说明
 
 ```text
-Browser UI
-  └─ calls /api/ai/chat
-       └─ server-side DeepSeek proxy
+浏览器界面
+  └─ 请求 /api/ai/chat
+       └─ 服务端 DeepSeek 代理
             └─ https://api.deepseek.com/chat/completions
 ```
 
-The browser only calls this project's backend. It never receives `DEEPSEEK_API_KEY`. The server proxy enforces an origin allowlist, body size limit, rate limit, DeepSeek timeout, and no-store JSON responses.
+浏览器只请求本项目后端，不会拿到 `DEEPSEEK_API_KEY`。服务端代理负责来源白名单、请求体大小限制、基础限流、DeepSeek 超时控制和不缓存的 JSON 响应。
 
-## Repository layout
+## 目录结构
 
 ```text
 .
-├── app/                     # Next.js pages and API routes
-│   └── api/ai/chat/         # DeepSeek server-side proxy
-├── components/              # Chat simulator UI and game runtime
-├── data/                    # Stories, characters, chapters, and tactic data
-├── docs/                    # Production, open-source notes, and screenshots
-│   └── screenshots/         # Public README screenshots and visual baselines
-├── lib/ai/                  # DeepSeek server-side client
-├── public/                  # Avatars, favicon, and static assets
-├── scripts/                 # Repository, AI, and visual verification scripts
-└── output/visual-baseline/  # Optional local current screenshots; not committed
+├── app/                     # Next.js 页面和 API 路由
+│   └── api/ai/chat/         # DeepSeek 服务端代理
+├── components/              # 聊天模拟器界面和游戏运行时
+├── data/                    # 剧情、角色、章节和话术数据
+├── docs/                    # 生产部署、开源说明和 README 截图
+│   └── screenshots/         # 公开截图和视觉基线
+├── lib/ai/                  # DeepSeek 服务端客户端
+├── public/                  # 头像、图标和静态资源
+├── scripts/                 # 仓库、AI 和视觉验证脚本
+└── output/visual-baseline/  # 本地生成截图目录，不提交
 ```
 
-## Quick start
+## 本地启动
 
 ```bash
 npm install
 cp .env.example .env.local
-# Fill DEEPSEEK_API_KEY in .env.local
+# 在 .env.local 中填写 DEEPSEEK_API_KEY
 npm run dev
 ```
 
-Production build:
+生产构建：
 
 ```bash
 npm run build
 npm run start -- --port 4180
 ```
 
-## Environment variables
+## 环境变量
 
 ```bash
 DEEPSEEK_API_KEY=your DeepSeek API key
@@ -87,15 +98,15 @@ AI_RATE_LIMIT_WINDOW_MS=60000
 AI_RATE_LIMIT_MAX_REQUESTS=30
 ```
 
-`DEEPSEEK_API_KEY` is a server-only variable. Do not use a `NEXT_PUBLIC_*` prefix and do not commit it to git.
+`DEEPSEEK_API_KEY` 只能作为服务端变量使用。不要添加 `NEXT_PUBLIC_*` 前缀，也不要提交到版本库。
 
-## Verification
+## 验证命令
 
 ```bash
-# Full local verification
+# 完整本地验证
 npm run verify
 
-# Individual checks
+# 单项检查
 python3 scripts/check_repository.py
 npm run verify:ai
 npm run build
@@ -103,32 +114,32 @@ python3 scripts/verify_visual_baseline.py
 npm audit --omit=dev
 ```
 
-`verify:ai` uses a mocked DeepSeek request to verify the production-critical path: endpoint, model, authorization source, disabled thinking mode, origin allowlist, payload size limit, custom player-name context, and health route.
+`verify:ai` 使用模拟 DeepSeek 请求验证生产关键路径：接口地址、模型名称、鉴权来源、关闭思考模式、来源白名单、请求体大小限制、玩家自定义姓名上下文和健康检查接口。
 
-## Clone-size policy
+## 仓库体积约定
 
-To keep the repository fast to clone:
+为了让仓库保持轻量：
 
-- Do not commit `node_modules/`, `.next/`, `.env*`, logs, or temporary downloads.
-- Do not commit `output/visual-baseline/current-*.png`.
-- Keep only the compressed README screenshots in `docs/screenshots/`.
-- Compress new image assets before committing them.
-- Do not commit design source files or oversized ad-hoc screenshots.
+- 不提交 `node_modules/`、`.next/`、`.env*`、日志或临时下载文件。
+- 不提交 `output/visual-baseline/current-*.png`。
+- 项目首页文档只引用 `docs/screenshots/` 中压缩后的截图。
+- 新增图片资源前先压缩。
+- 不提交设计源文件或临时大截图。
 
-## Adding a new story
+## 新增剧本
 
-When adding a story, the default files to update are:
+新增剧本时，通常需要更新这些文件：
 
 - `data/girls.json`
 - `data/scenes.json`
-- `data/chapters.json`, if the chapter structure changes
-- Character images under `public/`
+- `data/chapters.json`，仅章节结构变化时需要
+- `public/` 下的角色图片
 
-The home flow randomly selects a character from `data/girls.json`, so newly connected stories enter the random pool automatically.
+首页会从 `data/girls.json` 中随机选择角色，所以接好 `firstScene` 后，新角色会自动进入随机池。
 
-### 1. Add a character entry
+### 1. 添加角色
 
-Add a character object in `data/girls.json`:
+在 `data/girls.json` 中添加角色对象：
 
 ```json
 "yue": {
@@ -141,15 +152,15 @@ Add a character object in `data/girls.json`:
 }
 ```
 
-Place the avatar at:
+头像文件放在：
 
 ```bash
 public/yue.png
 ```
 
-### 2. Add the story tree in `scenes.json`
+### 2. 添加剧情树
 
-Add story nodes in `data/scenes.json`. Use an isolated prefix such as `yue_`:
+在 `data/scenes.json` 中添加剧情节点。建议使用独立前缀，例如 `yue_`：
 
 ```json
 {
@@ -176,14 +187,14 @@ Add story nodes in `data/scenes.json`. Use an isolated prefix such as `yue_`:
 }
 ```
 
-Story progression uses two mechanisms:
+剧情推进有两种方式：
 
-- `choices[].nextScene`: jump after a player choice.
-- `autoNext`: jump automatically after the current node finishes.
+- `choices[].nextScene`：玩家选择后跳转。
+- `autoNext`：当前节点结束后自动跳转。
 
-### 3. Prefer explicit ending data
+### 3. 优先使用显式结局数据
 
-The most stable ending approach is to place `endingData` directly on the ending scene, so no JavaScript change is required:
+最稳定的做法是在结局节点中直接放置 `endingData`，这样不需要改 JavaScript：
 
 ```json
 {
@@ -201,17 +212,17 @@ The most stable ending approach is to place `endingData` directly on the ending 
 }
 ```
 
-If `endingData` is omitted and you want to reuse randomized ending pools, update both:
+如果省略 `endingData`，并且想复用随机结局池，需要同时更新：
 
 - `components/chat/endingPools.js`
 - `components/chat/gameEngine.js`
 
-Otherwise, the new story prefix will not map to the intended ending pool.
+否则，新剧本前缀不会映射到预期的结局池。
 
-## Documentation
+## 相关文档
 
-- [`docs/production.md`](docs/production.md) — Production deployment, security boundary, and environment variables
-- [`docs/open-source.md`](docs/open-source.md) — Open-source scope and release notes
-- [`CONTRIBUTING.md`](CONTRIBUTING.md) — Contribution notes
-- [`SECURITY.md`](SECURITY.md) — Security policy
-- [`LICENSE`](LICENSE) — MIT License
+- [`docs/production.md`](docs/production.md)：生产部署、安全边界和环境变量
+- [`docs/open-source.md`](docs/open-source.md)：开源范围和发布说明
+- [`CONTRIBUTING.md`](CONTRIBUTING.md)：贡献说明
+- [`SECURITY.md`](SECURITY.md)：安全策略
+- [`LICENSE`](LICENSE)：MIT 协议
