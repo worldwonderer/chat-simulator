@@ -15,9 +15,14 @@ function readPositiveNumberEnv(name, fallback) {
   return Number.isFinite(value) && value > 0 ? value : fallback;
 }
 
+function readNonNegativeNumberEnv(name, fallback) {
+  const value = Number(process.env[name]);
+  return Number.isFinite(value) && value >= 0 ? value : fallback;
+}
+
 const MAX_REQUEST_BODY_BYTES = readPositiveNumberEnv("AI_MAX_REQUEST_BODY_BYTES", 16 * 1024);
 const RATE_LIMIT_WINDOW_MS = readPositiveNumberEnv("AI_RATE_LIMIT_WINDOW_MS", 60 * 1000);
-const RATE_LIMIT_MAX_REQUESTS = readPositiveNumberEnv("AI_RATE_LIMIT_MAX_REQUESTS", 30);
+const RATE_LIMIT_MAX_REQUESTS = readNonNegativeNumberEnv("AI_RATE_LIMIT_MAX_REQUESTS", 30);
 
 const rateLimitBuckets = globalThis.__chatSimulatorAiRateLimitBuckets ?? new Map();
 globalThis.__chatSimulatorAiRateLimitBuckets = rateLimitBuckets;

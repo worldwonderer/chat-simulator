@@ -187,6 +187,18 @@ if (invalidNumericEnvResponse.status !== 413 || invalidNumericEnvData.error !== 
 
 process.env.AI_MAX_REQUEST_BODY_BYTES = '';
 process.env.AI_RATE_LIMIT_WINDOW_MS = '';
+process.env.AI_RATE_LIMIT_MAX_REQUESTS = '0';
+const { POST: postWithDisabledRateLimit } = await import(`../app/api/ai/chat/route.js?disabled-rate-limit=${Date.now()}`);
+let disabledRateLimitResult;
+for (let requestIndex = 1; requestIndex <= 31; requestIndex += 1) {
+  const response = await postWithDisabledRateLimit(buildRequest(validPayload, { 'x-forwarded-for': '203.0.113.77' }));
+  disabledRateLimitResult = { requestIndex, status: response.status, data: await response.json() };
+}
+
+if (disabledRateLimitResult.status !== 200 || disabledRateLimitResult.data.content !== '哈哈，没想到你还挺认真。') {
+  throw new Error(`AI_RATE_LIMIT_MAX_REQUESTS=0 should disable the in-memory rate limit: ${JSON.stringify(disabledRateLimitResult)}`);
+}
+
 process.env.AI_RATE_LIMIT_MAX_REQUESTS = '30';
 
 const preflightResponse = OPTIONS(new Request('http://localhost/api/ai/chat', {
