@@ -136,6 +136,22 @@ if (invalidBaseUrlResponse.status !== 500 || invalidBaseUrlData.error !== 'inval
   throw new Error(`invalid DeepSeek base URL should be reported as configuration error: ${JSON.stringify({ status: invalidBaseUrlResponse.status, invalidBaseUrlData })}`);
 }
 
+process.env.DEEPSEEK_BASE_URL = 'not-a-url';
+const malformedBaseUrlResponse = await POST(buildRequest(validPayload));
+const malformedBaseUrlData = await malformedBaseUrlResponse.json();
+
+if (malformedBaseUrlResponse.status !== 500 || malformedBaseUrlData.error !== 'invalid_deepseek_base_url') {
+  throw new Error(`malformed DeepSeek base URL should be reported as configuration error: ${JSON.stringify({ status: malformedBaseUrlResponse.status, malformedBaseUrlData })}`);
+}
+
+process.env.DEEPSEEK_BASE_URL = 'https://proxy.example/deepseek/v1';
+const pathBaseUrlResponse = await POST(buildRequest(validPayload));
+const pathBaseUrlData = await pathBaseUrlResponse.json();
+
+if (pathBaseUrlResponse.status !== 200 || captured.url !== 'https://proxy.example/deepseek/v1/chat/completions') {
+  throw new Error(`DeepSeek base URL paths should be preserved for compatible proxies: ${JSON.stringify({ status: pathBaseUrlResponse.status, pathBaseUrlData, url: captured.url })}`);
+}
+
 process.env.DEEPSEEK_BASE_URL = 'https://api.deepseek.com';
 process.env.DEEPSEEK_TIMEOUT_MS = '5';
 globalThis.fetch = async () => new Response(new ReadableStream({

@@ -130,7 +130,7 @@ if 'sk-' in env_example:
     raise SystemExit('.env.example must not contain a real API key')
 if 'deepseek-v4-flash' not in deepseek_source:
     raise SystemExit('DeepSeek client must default to deepseek-v4-flash')
-if 'https://api.deepseek.com' not in deepseek_source or '/chat/completions' not in deepseek_source:
+if 'https://api.deepseek.com' not in deepseek_source or 'chat/completions' not in deepseek_source:
     raise SystemExit('DeepSeek client must target the OpenAI-compatible DeepSeek chat completions endpoint')
 if 'thinking: { type: "disabled" }' not in deepseek_source:
     raise SystemExit('DeepSeek client must disable thinking mode for direct chat-bubble replies')
