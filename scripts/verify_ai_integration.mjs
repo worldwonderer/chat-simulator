@@ -91,6 +91,18 @@ if (captured.authHeader !== 'Bearer test-key') {
   throw new Error('DeepSeek authorization header was not derived from DEEPSEEK_API_KEY');
 }
 
+process.env.DEEPSEEK_API_KEY = '   ';
+const whitespaceKeyResponse = await POST(buildRequest(validPayload));
+const whitespaceKeyData = await whitespaceKeyResponse.json();
+const whitespaceHealthResponse = healthCheck();
+const whitespaceHealthData = await whitespaceHealthResponse.json();
+
+if (whitespaceKeyResponse.status !== 503 || whitespaceKeyData.error !== 'missing_api_key' || whitespaceHealthData.deepseekConfigured !== false) {
+  throw new Error(`whitespace-only DeepSeek API keys must be treated as missing: ${JSON.stringify({ status: whitespaceKeyResponse.status, whitespaceKeyData, whitespaceHealthData })}`);
+}
+
+process.env.DEEPSEEK_API_KEY = 'test-key';
+
 if (!captured.hasSystemPrompt || !captured.hasUserPrompt) {
   throw new Error('DeepSeek request did not include system and user messages');
 }

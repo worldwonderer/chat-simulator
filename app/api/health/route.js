@@ -6,7 +6,7 @@ export function GET() {
     {
       ok: true,
       service: "chat-simulator",
-      deepseekConfigured: Boolean(process.env.DEEPSEEK_API_KEY),
+      deepseekConfigured: Boolean(process.env.DEEPSEEK_API_KEY?.trim()),
     },
     {
       headers: {

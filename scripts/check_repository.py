@@ -100,7 +100,7 @@ if 'APP_PUBLIC_URL=https://chat.vibecoco.ai' not in env_example or 'AI_ALLOWED_O
     raise SystemExit('.env.example must document production origin settings')
 if 'NEXT_PUBLIC_DEEPSEEK' in env_example:
     raise SystemExit('.env.example must not suggest browser-exposed DeepSeek variables')
-if 'DEEPSEEK_API_KEY' not in health_source or 'deepseekConfigured' not in health_source:
+if 'DEEPSEEK_API_KEY' not in health_source or 'deepseekConfigured' not in health_source or '.trim()' not in health_source:
     raise SystemExit('Health route must report DeepSeek configuration without exposing secrets')
 if 'metadataBase' not in layout_source or '/favicon.ico' not in layout_source or '/apple-touch-icon.png' not in layout_source:
     raise SystemExit('Layout metadata must configure production URL and icons')
