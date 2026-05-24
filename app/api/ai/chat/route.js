@@ -4,9 +4,14 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const DEFAULT_ALLOWED_ORIGINS = ["https://chat.vibecoco.ai", "http://localhost:3000", "http://127.0.0.1:3000"];
-const MAX_REQUEST_BODY_BYTES = Number(process.env.AI_MAX_REQUEST_BODY_BYTES || 16 * 1024);
-const RATE_LIMIT_WINDOW_MS = Number(process.env.AI_RATE_LIMIT_WINDOW_MS || 60 * 1000);
-const RATE_LIMIT_MAX_REQUESTS = Number(process.env.AI_RATE_LIMIT_MAX_REQUESTS || 30);
+function readPositiveNumberEnv(name, fallback) {
+  const value = Number(process.env[name]);
+  return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+const MAX_REQUEST_BODY_BYTES = readPositiveNumberEnv("AI_MAX_REQUEST_BODY_BYTES", 16 * 1024);
+const RATE_LIMIT_WINDOW_MS = readPositiveNumberEnv("AI_RATE_LIMIT_WINDOW_MS", 60 * 1000);
+const RATE_LIMIT_MAX_REQUESTS = readPositiveNumberEnv("AI_RATE_LIMIT_MAX_REQUESTS", 30);
 
 const rateLimitBuckets = globalThis.__chatSimulatorAiRateLimitBuckets ?? new Map();
 globalThis.__chatSimulatorAiRateLimitBuckets = rateLimitBuckets;

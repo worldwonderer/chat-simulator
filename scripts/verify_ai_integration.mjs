@@ -153,6 +153,21 @@ if (oversizedResponse.status !== 413 || oversizedData.error !== 'request_too_lar
   throw new Error(`unexpected oversized response: ${JSON.stringify({ status: oversizedResponse.status, oversizedData })}`);
 }
 
+process.env.AI_MAX_REQUEST_BODY_BYTES = 'not-a-number';
+process.env.AI_RATE_LIMIT_WINDOW_MS = 'not-a-number';
+process.env.AI_RATE_LIMIT_MAX_REQUESTS = 'not-a-number';
+const { POST: postWithInvalidNumericEnv } = await import(`../app/api/ai/chat/route.js?invalid-numeric-env=${Date.now()}`);
+const invalidNumericEnvResponse = await postWithInvalidNumericEnv(oversizedRequest.clone());
+const invalidNumericEnvData = await invalidNumericEnvResponse.json();
+
+if (invalidNumericEnvResponse.status !== 413 || invalidNumericEnvData.error !== 'request_too_large') {
+  throw new Error(`invalid numeric AI env values should fall back to safe defaults: ${JSON.stringify({ status: invalidNumericEnvResponse.status, invalidNumericEnvData })}`);
+}
+
+process.env.AI_MAX_REQUEST_BODY_BYTES = '';
+process.env.AI_RATE_LIMIT_WINDOW_MS = '';
+process.env.AI_RATE_LIMIT_MAX_REQUESTS = '30';
+
 const preflightResponse = OPTIONS(new Request('http://localhost/api/ai/chat', {
   method: 'OPTIONS',
   headers: { origin: 'https://chat.vibecoco.ai' },
