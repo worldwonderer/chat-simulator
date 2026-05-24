@@ -11,7 +11,7 @@ const originalFetch = globalThis.fetch;
 let captured;
 let nextMockContent = '哈哈，没想到你还挺认真。';
 
-globalThis.fetch = async (url, options) => {
+const mockDeepSeekFetch = async (url, options) => {
   const body = JSON.parse(options.body);
   captured = {
     url,
@@ -30,6 +30,8 @@ globalThis.fetch = async (url, options) => {
     headers: { 'Content-Type': 'application/json' },
   });
 };
+
+globalThis.fetch = mockDeepSeekFetch;
 
 function buildRequest(body, headers = {}) {
   return new Request('http://localhost/api/ai/chat', {
@@ -135,6 +137,27 @@ if (invalidBaseUrlResponse.status !== 500 || invalidBaseUrlData.error !== 'inval
 }
 
 process.env.DEEPSEEK_BASE_URL = 'https://api.deepseek.com';
+process.env.DEEPSEEK_TIMEOUT_MS = '5';
+globalThis.fetch = async () => new Response(new ReadableStream({
+  start(controller) {
+    setTimeout(() => {
+      controller.enqueue(new TextEncoder().encode(JSON.stringify({ choices: [{ message: { content: '慢响应' } }] })));
+      controller.close();
+    }, 50);
+  },
+}), {
+  status: 200,
+  headers: { 'Content-Type': 'application/json' },
+});
+const slowBodyResponse = await POST(buildRequest(validPayload));
+const slowBodyData = await slowBodyResponse.json();
+
+if (slowBodyResponse.status !== 504 || slowBodyData.error !== 'deepseek_timeout') {
+  throw new Error(`slow DeepSeek response bodies should be covered by DEEPSEEK_TIMEOUT_MS: ${JSON.stringify({ status: slowBodyResponse.status, slowBodyData })}`);
+}
+
+process.env.DEEPSEEK_TIMEOUT_MS = '8000';
+globalThis.fetch = mockDeepSeekFetch;
 
 const badRequest = buildRequest({ targetLine: '' });
 const badResponse = await POST(badRequest);
