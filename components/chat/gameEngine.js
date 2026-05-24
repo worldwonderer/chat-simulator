@@ -4,6 +4,7 @@ import * as React from "react";
 import { girlsById, scenes } from "./gameData";
 import { endingPools } from "./endingPools";
 import { useGameStore } from "./store";
+import { resolveHerMessageContent } from "./aiDialogue";
 
 let messageCounter = 0;
 let runToken = 0;
@@ -79,7 +80,7 @@ export async function runScene(scene, token) {
     if (token !== runToken) return;
 
     const { playerName } = useGameStore.getState();
-    const content = rawMessage.content ? rawMessage.content.replace(/\{name\}/g, playerName ?? "你") : "";
+    let content = rawMessage.content ? rawMessage.content.replace(/\{name\}/g, playerName ?? "你") : "";
 
     if (rawMessage.type === "silent") {
       await delay(rawMessage.delay ?? 500);
@@ -90,9 +91,17 @@ export async function runScene(scene, token) {
       let textLength = content.replace(/\[TIME\]/g, "").length;
       if (content.includes("[图片") || rawMessage.image) textLength = 5;
       const typingDelay = rawMessage.delay ?? Math.min(4500, Math.max(1200, 120 * textLength + 400));
+      const state = useGameStore.getState();
+      const girl = girlsById[state.currentGirlId] ?? { id: state.currentGirlId, name: state.girlName };
+
       useGameStore.setState({ isTyping: true });
-      await delay(typingDelay);
+      const aiContentPromise = resolveHerMessageContent({ rawMessage, fallbackContent: content, scene, girl, state });
+      const [resolvedContent] = await Promise.all([
+        Promise.race([aiContentPromise, delay(typingDelay).then(() => content)]),
+        delay(typingDelay),
+      ]);
       if (token !== runToken) return;
+      content = resolvedContent;
       useGameStore.setState({ isTyping: false });
     } else if (rawMessage.sender === "system") {
       await delay(rawMessage.delay ?? 800);
