@@ -141,6 +141,27 @@ if (blockedOriginResponse.status !== 403 || blockedOriginData.error !== 'origin_
   throw new Error(`unexpected blocked-origin response: ${JSON.stringify({ status: blockedOriginResponse.status, blockedOriginData })}`);
 }
 
+process.env.NODE_ENV = 'production';
+const { POST: productionPost, OPTIONS: productionOptions } = await import(`../app/api/ai/chat/route.js?production-cors=${Date.now()}`);
+const productionLocalhostResponse = await productionPost(buildRequest(validPayload, { origin: 'http://localhost:3000' }));
+const productionLocalhostData = await productionLocalhostResponse.json();
+
+if (productionLocalhostResponse.status !== 403 || productionLocalhostData.error !== 'origin_not_allowed') {
+  throw new Error(`production AI route must not allow localhost by default: ${JSON.stringify({ status: productionLocalhostResponse.status, productionLocalhostData })}`);
+}
+
+const productionLocalhostPreflight = productionOptions(new Request('http://localhost/api/ai/chat', {
+  method: 'OPTIONS',
+  headers: { origin: 'http://localhost:3000' },
+}));
+const productionLocalhostPreflightData = await productionLocalhostPreflight.json();
+
+if (productionLocalhostPreflight.status !== 403 || productionLocalhostPreflightData.error !== 'origin_not_allowed') {
+  throw new Error('production AI route preflight must not allow localhost by default');
+}
+
+process.env.NODE_ENV = '';
+
 const oversizedRequest = new Request('http://localhost/api/ai/chat', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json', origin: 'https://chat.vibecoco.ai', 'content-length': '20000' },

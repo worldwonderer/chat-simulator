@@ -3,7 +3,13 @@ import { DEEPSEEK_MODEL, createDeepSeekChatCompletion } from "../../../../lib/ai
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-const DEFAULT_ALLOWED_ORIGINS = ["https://chat.vibecoco.ai", "http://localhost:3000", "http://127.0.0.1:3000"];
+const PRODUCTION_ORIGIN = "https://chat.vibecoco.ai";
+const DEVELOPMENT_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"];
+
+function getDefaultAllowedOrigins() {
+  return process.env.NODE_ENV === "production" ? [PRODUCTION_ORIGIN] : [PRODUCTION_ORIGIN, ...DEVELOPMENT_ALLOWED_ORIGINS];
+}
+
 function readPositiveNumberEnv(name, fallback) {
   const value = Number(process.env[name]);
   return Number.isFinite(value) && value > 0 ? value : fallback;
@@ -64,7 +70,7 @@ function getAllowedOrigins() {
     .map((value) => value.trim().replace(/\/+$/, ""))
     .filter(Boolean);
 
-  return new Set([...DEFAULT_ALLOWED_ORIGINS, ...configuredOrigins]);
+  return new Set([...getDefaultAllowedOrigins(), ...configuredOrigins]);
 }
 
 function isOriginAllowed(request) {
