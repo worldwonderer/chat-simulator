@@ -1,5 +1,17 @@
+const DEFAULT_PUBLIC_URL = "https://chat.vibecoco.ai";
+
+function readMetadataBaseUrl() {
+  const configuredUrl = typeof process.env.APP_PUBLIC_URL === "string" ? process.env.APP_PUBLIC_URL.trim() : "";
+
+  try {
+    return new URL(configuredUrl || DEFAULT_PUBLIC_URL);
+  } catch {
+    return new URL(DEFAULT_PUBLIC_URL);
+  }
+}
+
 export const metadata = {
-  metadataBase: new URL(process.env.APP_PUBLIC_URL || "https://chat.vibecoco.ai"),
+  metadataBase: readMetadataBaseUrl(),
   title: "聊天模拟器",
   description: "互动式聊天剧情模拟器",
   icons: {

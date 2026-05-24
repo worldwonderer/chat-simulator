@@ -111,6 +111,8 @@ if 'DEEPSEEK_API_KEY' not in health_source or 'deepseekConfigured' not in health
     raise SystemExit('Health route must report DeepSeek configuration without exposing secrets')
 if 'metadataBase' not in layout_source or '/favicon.ico' not in layout_source or '/apple-touch-icon.png' not in layout_source:
     raise SystemExit('Layout metadata must configure production URL and icons')
+if 'readMetadataBaseUrl()' not in layout_source or 'process.env.APP_PUBLIC_URL.trim()' not in layout_source or 'catch {' not in layout_source:
+    raise SystemExit('Layout metadata must trim and safely fall back for invalid APP_PUBLIC_URL values')
 if 'https://chat.vibecoco.ai/' not in readme_source or 'MIT' not in readme_source:
     raise SystemExit('README must document the production demo URL and MIT license')
 if 'docs/screenshots/home.png' not in readme_source or 'docs/screenshots/playing.png' not in readme_source:
