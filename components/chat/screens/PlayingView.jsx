@@ -20,6 +20,7 @@ export default function PlayingView() {
     affection,
     anxiety,
     chapter,
+    timeLabel,
     playerName,
     girlName,
     girlAvatar,
@@ -80,7 +81,7 @@ export default function PlayingView() {
 
   return (
     <div className="h-full flex flex-col bg-[var(--wechat-bg)] overflow-hidden">
-      <StatusBar />
+      <StatusBar time={timeLabel} />
       <ConversationHeader name={girlName} avatar={girlAvatar} isTyping={isTyping} />
       <GameStatusBar affection={affection} anxiety={anxiety} chapter={chapter} />
 

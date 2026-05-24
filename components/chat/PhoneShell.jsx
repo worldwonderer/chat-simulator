@@ -9,7 +9,13 @@ export default function PhoneShell({ children }) {
           <div className="absolute left-[-3px] top-24 w-[3px] h-10 bg-gray-600 rounded-l-sm" />
           <div className="absolute left-[-3px] top-36 w-[3px] h-10 bg-gray-600 rounded-l-sm" />
 
-          <div className="relative bg-[var(--wechat-bg)] rounded-[34px] overflow-hidden w-[375px] h-[750px] md:w-[390px] md:h-[780px]">
+          <div
+            className="relative bg-[var(--wechat-bg)] rounded-[34px] overflow-hidden w-[375px] h-[750px] md:w-[390px] md:h-[780px]"
+            style={{
+              maxWidth: "calc(100vw - 64px)",
+              maxHeight: "calc(100svh - 64px)",
+            }}
+          >
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-b-2xl z-50 flex items-center justify-center gap-2">
               <div className="w-2 h-2 rounded-full bg-gray-800" />
               <div className="w-4 h-1.5 rounded-full bg-gray-800" />

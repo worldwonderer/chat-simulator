@@ -2451,7 +2451,8 @@
         "affectionDelta": -2,
         "anxietyDelta": 4,
         "nextScene": "scene_09_cold_c",
-        "badgeText": "内耗"
+        "badgeText": "内耗",
+        "replyText": ""
       },
       {
         "id": "d",
@@ -2460,7 +2461,8 @@
         "affectionDelta": -5,
         "anxietyDelta": 0,
         "nextScene": "scene_09_cold_d",
-        "badgeText": "自尊"
+        "badgeText": "自尊",
+        "replyText": ""
       }
     ]
   },
@@ -4449,7 +4451,8 @@
         "affectionDelta": 10,
         "anxietyDelta": -2,
         "nextScene": "tan_scene_05_ans_c",
-        "badgeText": "保持框架"
+        "badgeText": "保持框架",
+        "replyText": ""
       }
     ]
   },

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,6 +61,8 @@ deepseek_source = (ROOT / 'lib' / 'ai' / 'deepseek.js').read_text()
 route_source = (ROOT / 'app' / 'api' / 'ai' / 'chat' / 'route.js').read_text()
 client_ai_source = (ROOT / 'components' / 'chat' / 'aiDialogue.js').read_text()
 intro_source = (ROOT / 'components' / 'chat' / 'screens' / 'IntroView.jsx').read_text()
+playing_source = (ROOT / 'components' / 'chat' / 'screens' / 'PlayingView.jsx').read_text()
+phone_shell_source = (ROOT / 'components' / 'chat' / 'PhoneShell.jsx').read_text()
 ai_verify_source = (ROOT / 'scripts' / 'verify_ai_integration.mjs').read_text()
 package_data = json.loads((ROOT / 'package.json').read_text())
 lock_data = json.loads((ROOT / 'package-lock.json').read_text())
@@ -146,6 +149,10 @@ if "catch {\n    return null;\n  }" not in intro_source or 'persistence is optio
     raise SystemExit('Intro safe localStorage helpers must swallow blocked-storage errors and continue')
 if "localStorage.getItem('LAST_PLAYED_GIRL')" in intro_source or "localStorage.setItem('LAST_PLAYED_GIRL'" in intro_source:
     raise SystemExit('Intro start flow must not directly call localStorage with string keys')
+if 'timeLabel,' not in playing_source or '<StatusBar time={timeLabel} />' not in playing_source:
+    raise SystemExit('Playing view must pass scene timeLabel into StatusBar instead of showing only real clock time')
+if 'maxWidth: "calc(100vw - 64px)"' not in phone_shell_source or 'maxHeight: "calc(100svh - 64px)"' not in phone_shell_source:
+    raise SystemExit('Phone shell must cap the fixed device frame to avoid overflowing small mobile viewports')
 if 'deepseek-v4-flash' not in ai_verify_source or 'https://api.deepseek.com/chat/completions' not in ai_verify_source:
     raise SystemExit('AI integration verifier must assert the DeepSeek model and endpoint')
 if "thinkingType !== 'disabled'" not in ai_verify_source:
@@ -163,6 +170,7 @@ if not isinstance(tactics, list) or not tactics:
 scene_ids = {scene['id'] for scene in scenes}
 missing_public_assets: list[str] = []
 missing_scene_links: list[str] = []
+implicit_silent_choices: list[str] = []
 
 for girl_id, girl in girls.items():
     avatar = girl.get('avatar', '')
@@ -186,12 +194,25 @@ for scene in scenes:
         if next_scene and next_scene not in scene_ids:
             missing_scene_links.append(f"{scene['id']}.{choice.get('id', '?')} -> {next_scene}")
 
+        reply_source = choice['replyText'] if choice.get('replyText') is not None else choice.get('text', '')
+        if not isinstance(reply_source, str):
+            reply_source = ''
+        rendered_reply = reply_source.replace('{name}', '李雷')
+        rendered_reply = re.sub(r'^[（(][^）)]+[）)]\s*', '', rendered_reply)
+        rendered_reply = re.sub(r'\s*[（(][^）)]+[）)]$', '', rendered_reply).strip()
+        if not rendered_reply and choice.get('replyText') != '':
+            implicit_silent_choices.append(f"{scene['id']}.{choice.get('id', '?')}")
+
 if missing_public_assets:
     raise SystemExit('Missing public assets: ' + ', '.join(sorted(set(missing_public_assets))))
 
 if missing_scene_links:
     preview = ', '.join(missing_scene_links[:10])
     raise SystemExit(f'Broken scene links detected ({len(missing_scene_links)}): {preview}')
+
+if implicit_silent_choices:
+    preview = ', '.join(implicit_silent_choices[:10])
+    raise SystemExit(f'Choices that render no player bubble must declare replyText=\"\" ({len(implicit_silent_choices)}): {preview}')
 
 print('Repository structure check: PASS')
 print(
