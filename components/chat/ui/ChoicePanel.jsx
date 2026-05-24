@@ -12,7 +12,10 @@ export default function ChoicePanel({ choices, onSelect, disabled = false }) {
   const [revealedChoiceId, setRevealedChoiceId] = useState(null);
 
   return (
-    <div className="shrink-0 bg-[#f0f0f0] border-t border-[#d9d9d9] pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+    <div
+      className="shrink-0 bg-[#f0f0f0] border-t border-[#d9d9d9] shadow-[0_-4px_20px_rgba(0,0,0,0.03)]"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+    >
       <div className="flex items-center justify-center py-[7px] border-b border-[#e5e5e5]">
         <span className="text-[11px] text-[#aaa]">{revealedChoiceId ? '判定结果揭晓...' : '选择你的回复方式'}</span>
       </div>

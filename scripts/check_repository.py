@@ -65,6 +65,7 @@ client_ai_source = (ROOT / 'components' / 'chat' / 'aiDialogue.js').read_text()
 intro_source = (ROOT / 'components' / 'chat' / 'screens' / 'IntroView.jsx').read_text()
 playing_source = (ROOT / 'components' / 'chat' / 'screens' / 'PlayingView.jsx').read_text()
 phone_shell_source = (ROOT / 'components' / 'chat' / 'PhoneShell.jsx').read_text()
+choice_panel_source = (ROOT / 'components' / 'chat' / 'ui' / 'ChoicePanel.jsx').read_text()
 image_shim_source = (ROOT / 'components' / 'chat' / 'ui' / 'ImageShim.jsx').read_text()
 ai_verify_source = (ROOT / 'scripts' / 'verify_ai_integration.mjs').read_text()
 package_data = json.loads((ROOT / 'package.json').read_text())
@@ -156,6 +157,8 @@ if 'timeLabel,' not in playing_source or '<StatusBar time={timeLabel} />' not in
     raise SystemExit('Playing view must pass scene timeLabel into StatusBar instead of showing only real clock time')
 if 'maxWidth: "calc(100vw - 64px)"' not in phone_shell_source or 'maxHeight: "calc(100svh - 64px)"' not in phone_shell_source:
     raise SystemExit('Phone shell must cap the fixed device frame to avoid overflowing small mobile viewports')
+if 'pb-safe' in choice_panel_source or 'safe-area-inset-bottom' not in choice_panel_source:
+    raise SystemExit('Choice panel must use real safe-area bottom padding instead of an undefined pb-safe class')
 if 'unoptimized,' not in image_shim_source or 'placeholder,' not in image_shim_source or 'blurDataURL,' not in image_shim_source or '{...imgProps}' not in image_shim_source or '{...rest}' in image_shim_source:
     raise SystemExit('ImageShim must consume Next/Image-only props before spreading native img props')
 if 'deepseek-v4-flash' not in ai_verify_source or 'https://api.deepseek.com/chat/completions' not in ai_verify_source:
