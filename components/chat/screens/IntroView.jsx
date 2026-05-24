@@ -12,6 +12,24 @@ const BLOCKED_NAME_TOKENS = [
   '畜生', '狗', '死', '操', '贱', '骚', '爸爸', '婊子', '爸', '爹爹',
 ];
 
+const LAST_PLAYED_GIRL_KEY = 'LAST_PLAYED_GIRL';
+
+function readLastPlayedGirl() {
+  try {
+    return window.localStorage.getItem(LAST_PLAYED_GIRL_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeLastPlayedGirl(girlId) {
+  try {
+    window.localStorage.setItem(LAST_PLAYED_GIRL_KEY, girlId);
+  } catch {
+    // Storage can be blocked in private or hardened browser contexts; persistence is optional.
+  }
+}
+
 export default function IntroView() {
   const [playerNameInput, setPlayerNameInput] = useState('');
   const [screen, setScreen] = useState('welcome');
@@ -30,12 +48,12 @@ export default function IntroView() {
     setPlayerName(nextPlayerName);
 
     const girlIds = Object.keys(girlsById);
-    const lastPlayedGirl = localStorage.getItem('LAST_PLAYED_GIRL');
+    const lastPlayedGirl = readLastPlayedGirl();
     const eligibleGirls = girlIds.filter((girlId) => girlId !== lastPlayedGirl);
     const randomPool = eligibleGirls.length > 0 ? eligibleGirls : girlIds;
     const nextGirlId = randomPool[Math.floor(Math.random() * randomPool.length)];
 
-    localStorage.setItem('LAST_PLAYED_GIRL', nextGirlId);
+    writeLastPlayedGirl(nextGirlId);
     initializeGirl(nextGirlId);
     startGame();
   };

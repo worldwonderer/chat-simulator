@@ -59,6 +59,7 @@ env_example = (ROOT / '.env.example').read_text()
 deepseek_source = (ROOT / 'lib' / 'ai' / 'deepseek.js').read_text()
 route_source = (ROOT / 'app' / 'api' / 'ai' / 'chat' / 'route.js').read_text()
 client_ai_source = (ROOT / 'components' / 'chat' / 'aiDialogue.js').read_text()
+intro_source = (ROOT / 'components' / 'chat' / 'screens' / 'IntroView.jsx').read_text()
 ai_verify_source = (ROOT / 'scripts' / 'verify_ai_integration.mjs').read_text()
 package_data = json.loads((ROOT / 'package.json').read_text())
 lock_data = json.loads((ROOT / 'package-lock.json').read_text())
@@ -133,6 +134,14 @@ if 'createDeepSeekChatCompletion' not in route_source:
     raise SystemExit('AI route must call the DeepSeek completion client')
 if '/api/ai/chat' not in client_ai_source:
     raise SystemExit('Client AI dialogue helper must call the local AI route')
+if 'function readLastPlayedGirl()' not in intro_source or 'function writeLastPlayedGirl(girlId)' not in intro_source:
+    raise SystemExit('Intro start flow must use safe localStorage helpers so blocked storage cannot prevent game start')
+if 'window.localStorage.getItem(LAST_PLAYED_GIRL_KEY)' not in intro_source or 'window.localStorage.setItem(LAST_PLAYED_GIRL_KEY, girlId)' not in intro_source:
+    raise SystemExit('Intro start flow must keep LAST_PLAYED_GIRL persistence behind safe helper functions')
+if "catch {\n    return null;\n  }" not in intro_source or 'persistence is optional' not in intro_source:
+    raise SystemExit('Intro safe localStorage helpers must swallow blocked-storage errors and continue')
+if "localStorage.getItem('LAST_PLAYED_GIRL')" in intro_source or "localStorage.setItem('LAST_PLAYED_GIRL'" in intro_source:
+    raise SystemExit('Intro start flow must not directly call localStorage with string keys')
 if 'deepseek-v4-flash' not in ai_verify_source or 'https://api.deepseek.com/chat/completions' not in ai_verify_source:
     raise SystemExit('AI integration verifier must assert the DeepSeek model and endpoint')
 if "thinkingType !== 'disabled'" not in ai_verify_source:
