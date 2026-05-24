@@ -126,6 +126,16 @@ if (overlongResponse.status !== 502 || overlongData.error !== 'empty_ai_content'
 
 nextMockContent = '哈哈，没想到你还挺认真。';
 
+process.env.DEEPSEEK_BASE_URL = 'http://api.deepseek.com';
+const invalidBaseUrlResponse = await POST(buildRequest(validPayload));
+const invalidBaseUrlData = await invalidBaseUrlResponse.json();
+
+if (invalidBaseUrlResponse.status !== 500 || invalidBaseUrlData.error !== 'invalid_deepseek_base_url') {
+  throw new Error(`invalid DeepSeek base URL should be reported as configuration error: ${JSON.stringify({ status: invalidBaseUrlResponse.status, invalidBaseUrlData })}`);
+}
+
+process.env.DEEPSEEK_BASE_URL = 'https://api.deepseek.com';
+
 const badRequest = buildRequest({ targetLine: '' });
 const badResponse = await POST(badRequest);
 const badData = await badResponse.json();
