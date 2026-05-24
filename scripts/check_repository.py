@@ -107,6 +107,10 @@ if 'docs/screenshots/home.png' not in readme_source or 'docs/screenshots/playing
     raise SystemExit('README must include project screenshots')
 if 'DEEPSEEK_API_KEY' not in production_doc or 'deepseek-v4-flash' not in production_doc:
     raise SystemExit('Production docs must document server-only DeepSeek configuration')
+if 'production + local defaults' in production_doc:
+    raise SystemExit('Production docs must not describe localhost origins as production defaults')
+if 'localhost is rejected by default when `NODE_ENV=production`' not in production_doc:
+    raise SystemExit('Production docs must document that localhost origins are development-only defaults')
 
 if 'MIT License' not in (ROOT / 'LICENSE').read_text():
     raise SystemExit('Open source files must include an MIT license')

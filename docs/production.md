@@ -14,6 +14,8 @@ Browser UI -> Next.js app -> /api/ai/chat -> DeepSeek API
 
 The browser never receives `DEEPSEEK_API_KEY`. It only posts bounded context to the local backend route. The route validates payload size and origin, applies in-memory rate limiting, calls DeepSeek with `deepseek-v4-flash`, and returns only the generated chat-bubble text.
 
+Production defaults are intentionally stricter than development defaults: `http://localhost:3000` and `http://127.0.0.1:3000` are convenient local-development defaults, but they are not allowed by default when `NODE_ENV=production`. If a preview or staging environment needs extra origins, add them explicitly to `AI_ALLOWED_ORIGINS`.
+
 ## Required environment variables
 
 | Variable | Required | Default | Notes |
@@ -23,7 +25,7 @@ The browser never receives `DEEPSEEK_API_KEY`. It only posts bounded context to 
 | `DEEPSEEK_BASE_URL` | no | `https://api.deepseek.com` | Must be HTTPS. |
 | `DEEPSEEK_TIMEOUT_MS` | no | `8000` | Upstream timeout. |
 | `APP_PUBLIC_URL` | recommended | `https://chat.vibecoco.ai` in docs | Added to API origin allowlist. |
-| `AI_ALLOWED_ORIGINS` | recommended | production + local defaults | Comma-separated extra origins. |
+| `AI_ALLOWED_ORIGINS` | recommended | production origin only in production; localhost only outside production | Comma-separated extra origins. Add local origins here only when intentionally allowing them. |
 | `AI_MAX_REQUEST_BODY_BYTES` | no | `16384` | Rejects oversized AI payloads. |
 | `AI_RATE_LIMIT_WINDOW_MS` | no | `60000` | Rate-limit window per client IP. |
 | `AI_RATE_LIMIT_MAX_REQUESTS` | no | `30` | Set `0` to disable in-memory limit. |
@@ -44,7 +46,7 @@ npm audit --omit=dev
 - model is `deepseek-v4-flash`
 - thinking mode is disabled for direct bubble replies
 - authorization comes from `DEEPSEEK_API_KEY`
-- production origin is allowed, unknown origins are rejected
+- production origin is allowed, unknown origins are rejected, and localhost is rejected by default when `NODE_ENV=production`
 - oversized payloads are rejected
 - `/api/health` responds successfully
 
