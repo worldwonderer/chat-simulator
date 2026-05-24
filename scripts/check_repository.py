@@ -150,6 +150,8 @@ if 'createDeepSeekChatCompletion' not in route_source:
     raise SystemExit('AI route must call the DeepSeek completion client')
 if '/api/ai/chat' not in client_ai_source:
     raise SystemExit('Client AI dialogue helper must call the local AI route')
+if 'timeLabel: scene.timeLabel ?? state.timeLabel' not in client_ai_source or 'Client AI context must inherit the displayed scene timeLabel' not in ai_verify_source:
+    raise SystemExit('Client AI dialogue context must inherit displayed timeLabel for untimed continuation scenes')
 if 'function readLastPlayedGirl()' not in intro_source or 'function writeLastPlayedGirl(girlId)' not in intro_source:
     raise SystemExit('Intro start flow must use safe localStorage helpers so blocked storage cannot prevent game start')
 if 'window.localStorage.getItem(LAST_PLAYED_GIRL_KEY)' not in intro_source or 'window.localStorage.setItem(LAST_PLAYED_GIRL_KEY, girlId)' not in intro_source:

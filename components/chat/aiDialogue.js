@@ -57,7 +57,7 @@ export async function resolveHerMessageContent({ rawMessage, fallbackContent, sc
       id: scene.id,
       title: scene.title,
       chapter: scene.chapter,
-      timeLabel: scene.timeLabel,
+      timeLabel: scene.timeLabel ?? state.timeLabel,
       tactic: scene.puaTacticUsed,
     },
     targetLine: fallbackContent,

@@ -5,6 +5,7 @@ process.env.AI_ALLOWED_ORIGINS = 'https://chat.vibecoco.ai';
 process.env.AI_RATE_LIMIT_MAX_REQUESTS = '30';
 
 const { POST, OPTIONS } = await import('../app/api/ai/chat/route.js');
+const { resolveHerMessageContent } = await import('../components/chat/aiDialogue.js');
 const { GET: healthCheck } = await import('../app/api/health/route.js');
 
 const originalFetch = globalThis.fetch;
@@ -144,6 +145,34 @@ if (
 ) {
   throw new Error(`DeepSeek prompt did not include persona, script anchor, recent messages, and choice history: ${captured.userPrompt}`);
 }
+
+let clientAiPayload;
+globalThis.fetch = async (url, options) => {
+  clientAiPayload = JSON.parse(options.body);
+  return new Response(JSON.stringify({ content: '好的，我知道啦。' }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  });
+};
+
+const inheritedTimeReply = await resolveHerMessageContent({
+  rawMessage: { sender: 'her', content: '哈哈没事，你学得太认真啦' },
+  fallbackContent: '哈哈没事，你学得太认真啦',
+  scene: { id: 'scene_01_ans_a', title: '陌生的申请', chapter: 1 },
+  girl: validPayload.character,
+  state: {
+    playerName: '阿泽',
+    timeLabel: '周二 下午 14:32',
+    visibleMessages: validPayload.recentMessages,
+    choiceHistory: validPayload.choiceHistory,
+  },
+});
+
+if (inheritedTimeReply !== '好的，我知道啦。' || clientAiPayload.scene.timeLabel !== '周二 下午 14:32') {
+  throw new Error(`Client AI context must inherit the displayed scene timeLabel for untimed continuation scenes: ${JSON.stringify({ inheritedTimeReply, scene: clientAiPayload.scene })}`);
+}
+
+globalThis.fetch = mockDeepSeekFetch;
 
 if (okResponse.headers.get('access-control-allow-origin') !== 'https://chat.vibecoco.ai') {
   throw new Error('AI route did not echo the allowed production origin');
@@ -327,6 +356,7 @@ console.log(JSON.stringify({
   json_shaped_content: jsonShapedData.content,
   overlong_error: overlongData.error,
   max_tokens: captured.maxTokens,
+  inherited_time_label: clientAiPayload.scene.timeLabel,
   prompt_context: {
     player: userPromptPayload.player.name,
     character: userPromptPayload.character.name,
