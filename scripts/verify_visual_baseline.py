@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import json
+import struct
 from pathlib import Path
-from PIL import Image, ImageChops
+
 
 ROOT = Path(__file__).resolve().parents[1] / 'output' / 'visual-baseline'
+PNG_SIGNATURE = b'\x89PNG\r\n\x1a\n'
 PAIRS = [
     ('current-home.png', 'baseline-home.png', 'home'),
     ('current-name.png', 'baseline-name.png', 'name'),
@@ -13,8 +15,37 @@ PAIRS = [
     ('current-ending.png', 'baseline-ending.png', 'ending'),
 ]
 
+
+def read_png_size(path: Path) -> tuple[int, int]:
+    with path.open('rb') as file:
+        signature = file.read(8)
+        if signature != PNG_SIGNATURE:
+            raise SystemExit(f'not a PNG file: {path}')
+
+        chunk_length = struct.unpack('>I', file.read(4))[0]
+        chunk_type = file.read(4)
+        if chunk_type != b'IHDR' or chunk_length < 8:
+            raise SystemExit(f'invalid PNG header: {path}')
+
+        width, height = struct.unpack('>II', file.read(8))
+        return width, height
+
+
+def load_pillow_for_diff():
+    try:
+        from PIL import Image, ImageChops
+    except ModuleNotFoundError as error:
+        raise SystemExit(
+            'Pillow is required only for strict visual diff mode when current screenshots exist. '
+            'Install pillow locally or remove output/visual-baseline/current-*.png to use baseline-integrity mode.'
+        ) from error
+
+    return Image, ImageChops
+
+
 results = []
 missing_current = []
+pillow_modules = None
 
 for current_name, baseline_name, label in PAIRS:
     baseline_path = ROOT / baseline_name
@@ -23,7 +54,7 @@ for current_name, baseline_name, label in PAIRS:
     if not baseline_path.exists():
         raise SystemExit(f'missing visual baseline for {label}: {baseline_path}')
 
-    baseline = Image.open(baseline_path).convert('RGB')
+    baseline_size = read_png_size(baseline_path)
 
     if not current_path.exists():
         missing_current.append(current_name)
@@ -31,12 +62,17 @@ for current_name, baseline_name, label in PAIRS:
             {
                 'screen': label,
                 'mode': 'baseline-integrity',
-                'size': baseline.size,
-                'pass': baseline.width > 0 and baseline.height > 0,
+                'size': baseline_size,
+                'pass': baseline_size[0] > 0 and baseline_size[1] > 0,
             }
         )
         continue
 
+    if pillow_modules is None:
+        pillow_modules = load_pillow_for_diff()
+    Image, ImageChops = pillow_modules
+
+    baseline = Image.open(baseline_path).convert('RGB')
     current = Image.open(current_path).convert('RGB')
     if current.size != baseline.size:
         raise SystemExit(f'size mismatch for {label}: {current.size} vs {baseline.size}')
