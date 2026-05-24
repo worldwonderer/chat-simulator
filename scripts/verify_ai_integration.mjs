@@ -202,6 +202,14 @@ if (jsonArrayResponse.status !== 502 || jsonArrayData.error !== 'empty_ai_conten
   throw new Error(`Parseable JSON arrays should be rejected instead of displayed: ${JSON.stringify({ status: jsonArrayResponse.status, jsonArrayData })}`);
 }
 
+nextMockContent = '{content:"别想太多啦。"}';
+const malformedObjectResponse = await POST(buildRequest(validPayload));
+const malformedObjectData = await malformedObjectResponse.json();
+
+if (malformedObjectResponse.status !== 502 || malformedObjectData.error !== 'empty_ai_content') {
+  throw new Error(`Malformed object-shaped AI replies should be rejected instead of displayed: ${JSON.stringify({ status: malformedObjectResponse.status, malformedObjectData })}`);
+}
+
 nextMockContent = '{"debug":true}';
 const invalidJsonShapedResponse = await POST(buildRequest(validPayload));
 const invalidJsonShapedData = await invalidJsonShapedResponse.json();
@@ -371,6 +379,7 @@ console.log(JSON.stringify({
   oversized_error: oversizedData.error,
   json_shaped_content: jsonShapedData.content,
   bracket_prefixed_content: bracketPrefixedData.content,
+  malformed_object_error: malformedObjectData.error,
   overlong_error: overlongData.error,
   max_tokens: captured.maxTokens,
   inherited_time_label: clientAiPayload.scene.timeLabel,
