@@ -115,18 +115,18 @@ export default function PlayingView() {
         </div>
       ) : (
         <div className="shrink-0 bg-[#f5f5f5] border-t border-[#e0e0e0] px-2 py-[7px] flex items-center gap-1.5">
-          <button className="p-1.5 rounded-md active:bg-black/10">
+          <span aria-hidden="true" className="p-1.5 rounded-md">
             <MicIcon size={24} className="text-[#555]" strokeWidth={1.8} />
-          </button>
+          </span>
           <div className="flex-1 bg-white rounded-[5px] border border-[#ddd] px-3 h-[36px] flex items-center text-[13px] text-[#c0c0c0] shadow-inner">
             {isTyping ? '对方正在输入…' : '选择下方选项回复'}
           </div>
-          <button className="p-1.5 rounded-md active:bg-black/10">
+          <span aria-hidden="true" className="p-1.5 rounded-md">
             <SmileIcon size={22} className="text-[#555]" strokeWidth={1.8} />
-          </button>
-          <button className="p-1.5 rounded-md active:bg-black/10">
+          </span>
+          <span aria-hidden="true" className="p-1.5 rounded-md">
             <PlusIcon size={22} className="text-[#555]" strokeWidth={1.8} />
-          </button>
+          </span>
         </div>
       )}
     </div>

@@ -4,10 +4,10 @@ import { ChevronLeftIcon, PhoneIcon, EllipsisIcon } from './icons';
 export default function ConversationHeader({ name, avatar = '/avatar-girl.jpg', isTyping = false }) {
   return (
     <div className="wechat-header flex items-center h-[48px] px-2 shrink-0 relative select-none">
-      <button className="flex items-center text-white/90 active:text-white/50 transition-colors z-10 pr-2">
+      <span aria-hidden="true" className="flex items-center text-white/90 z-10 pr-2">
         <ChevronLeftIcon size={26} strokeWidth={2.2} className="-ml-0.5" />
         <span className="text-[15px] font-normal -ml-1" />
-      </button>
+      </span>
 
       <div className="absolute inset-0 flex items-center justify-center gap-[7px] pointer-events-none">
         <div className="relative shrink-0">
@@ -23,13 +23,13 @@ export default function ConversationHeader({ name, avatar = '/avatar-girl.jpg', 
         </div>
       </div>
 
-      <div className="ml-auto flex items-center gap-[18px] text-white/85 z-10 pl-2">
-        <button className="active:text-white/40 transition-colors">
+      <div aria-hidden="true" className="ml-auto flex items-center gap-[18px] text-white/85 z-10 pl-2">
+        <span>
           <PhoneIcon size={19} strokeWidth={1.8} />
-        </button>
-        <button className="active:text-white/40 transition-colors">
+        </span>
+        <span>
           <EllipsisIcon size={21} strokeWidth={2} />
-        </button>
+        </span>
       </div>
     </div>
   );
