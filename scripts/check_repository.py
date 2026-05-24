@@ -69,6 +69,7 @@ phone_shell_source = (ROOT / 'components' / 'chat' / 'PhoneShell.jsx').read_text
 conversation_header_source = (ROOT / 'components' / 'chat' / 'ui' / 'ConversationHeader.jsx').read_text()
 choice_panel_source = (ROOT / 'components' / 'chat' / 'ui' / 'ChoicePanel.jsx').read_text()
 image_shim_source = (ROOT / 'components' / 'chat' / 'ui' / 'ImageShim.jsx').read_text()
+status_bar_source = (ROOT / 'components' / 'chat' / 'ui' / 'StatusBar.jsx').read_text()
 ai_verify_source = (ROOT / 'scripts' / 'verify_ai_integration.mjs').read_text()
 package_data = json.loads((ROOT / 'package.json').read_text())
 lock_data = json.loads((ROOT / 'package-lock.json').read_text())
@@ -159,6 +160,8 @@ if "localStorage.getItem('LAST_PLAYED_GIRL')" in intro_source or "localStorage.s
     raise SystemExit('Intro start flow must not directly call localStorage with string keys')
 if 'timeLabel,' not in playing_source or '<StatusBar time={timeLabel} />' not in playing_source:
     raise SystemExit('Playing view must pass scene timeLabel into StatusBar instead of showing only real clock time')
+if 'resolveStatusBarLabel(time)' not in status_bar_source or '?? explicitLabel' not in status_bar_source:
+    raise SystemExit('StatusBar must preserve explicit narrative time labels that are not clock-shaped')
 if 'timeLabel: scene.timeLabel ?? state.timeLabel' not in game_engine_source or 'timeLabel: scene.timeLabel ?? ""' in game_engine_source:
     raise SystemExit('Untimed continuation scenes must inherit the previous scripted timeLabel instead of falling back to wall-clock time')
 if '<button' in conversation_header_source:

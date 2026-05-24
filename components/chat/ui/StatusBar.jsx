@@ -6,8 +6,15 @@ function getCurrentTimeLabel() {
   });
 }
 
+function resolveStatusBarLabel(time) {
+  const explicitLabel = typeof time === 'string' ? time.trim() : '';
+  if (!explicitLabel) return getCurrentTimeLabel();
+
+  return explicitLabel.match(/\d{2}:\d{2}$/)?.[0] ?? explicitLabel;
+}
+
 export default function StatusBar({ time }) {
-  const label = time ? time.match(/\d{2}:\d{2}$/)?.[0] ?? getCurrentTimeLabel() : getCurrentTimeLabel();
+  const label = resolveStatusBarLabel(time);
 
   return (
     <div className="flex items-center justify-between px-5 bg-[var(--wechat-bar)] text-white h-[28px] shrink-0">
