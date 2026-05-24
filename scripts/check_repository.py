@@ -182,6 +182,7 @@ missing_public_assets: list[str] = []
 missing_scene_links: list[str] = []
 implicit_silent_choices: list[str] = []
 bad_public_image_types: list[str] = []
+scenes_with_time_messages_missing_labels: list[str] = []
 
 
 def public_image_type(path: Path) -> str:
@@ -223,6 +224,9 @@ for girl_id, girl in girls.items():
         missing_scene_links.append(f'{girl_id}.firstScene -> {first_scene}')
 
 for scene in scenes:
+    if any(str(message.get('content', '')).startswith('[TIME]') for message in scene.get('messages', [])) and not scene.get('timeLabel'):
+        scenes_with_time_messages_missing_labels.append(scene['id'])
+
     auto_next = scene.get('autoNext')
     if auto_next and auto_next not in scene_ids:
         missing_scene_links.append(f"{scene['id']}.autoNext -> {auto_next}")
@@ -254,6 +258,10 @@ if missing_scene_links:
 if implicit_silent_choices:
     preview = ', '.join(implicit_silent_choices[:10])
     raise SystemExit(f'Choices that render no player bubble must declare replyText=\"\" ({len(implicit_silent_choices)}): {preview}')
+
+if scenes_with_time_messages_missing_labels:
+    preview = ', '.join(scenes_with_time_messages_missing_labels[:10])
+    raise SystemExit(f'Scenes with [TIME] messages must set timeLabel for the status bar ({len(scenes_with_time_messages_missing_labels)}): {preview}')
 
 print('Repository structure check: PASS')
 print(
