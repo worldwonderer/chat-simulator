@@ -18,3 +18,10 @@ node_modules/
 .next/
 .vercel/
 .omx/
+# environment / secrets
+.env
+.env.*
+!.env.example
+output/visual-baseline/current-*.png
+output/visual-current/
+coverage/
