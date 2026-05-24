@@ -1,78 +1,107 @@
 # chat-simulator
 
-一个基于 Next.js 的互动式聊天剧情模拟器项目。
+一个生产可部署的 Next.js 互动式中文聊天剧情模拟器。前端保持微信聊天式 UI，后端通过 Next.js API Route 代理 DeepSeek，让浏览器永远不直接接触 DeepSeek API Key。
 
-项目已经完成结构正规化：根目录是唯一正式应用入口，仓库只保留当前产品代码、数据、静态资源和通用视觉基线。
+- Demo：<https://chat.vibecoco.ai/>
+- License：MIT
+- AI 模型：`deepseek-v4-flash`
 
-## 当前状态
+## 功能状态
 
-- ✅ 单项目结构已完成
-- ✅ screen / UI / store / runtime 已完成模块化
-- ✅ 视觉基线校验可持续运行
-- 🔜 当前主要迭代方向：E2E 回归、剧情编辑流程、资产自主化
+- ✅ 单项目 Next.js 应用，根目录是唯一正式入口
+- ✅ 手机聊天 UI、剧情引擎、状态管理、结构化剧本数据已模块化
+- ✅ 后端 `/api/ai/chat` 封装 DeepSeek 请求，生产环境不泄漏 key
+- ✅ AI 回复参考原剧本 `targetLine`，失败/超时自动回退原文案
+- ✅ favicon / app icon / Apple touch icon 已准备
+- ✅ MIT License、贡献指南、安全说明、生产部署文档已准备
+- ✅ 生成物和 current screenshots 不提交，降低 clone 体积
 
-## 在线地址
+## 部署
 
-- 生产域名：<https://chat.vibecoco.ai>
-- Vercel 地址：<https://chat-vibecoco-ai.vercel.app>
+Vercel 项目 `chat-vibecoco-ai` 已连接到 GitHub 仓库 `worldwonderer/chat-simulator`。推送到 `main` 分支会自动触发生产部署；Next.js 页面和 `app/api/*` 后端路由会在同一次 Vercel 构建中一起发布。
+
+## 架构
+
+```text
+Browser UI
+  └─ calls /api/ai/chat
+       └─ server-side DeepSeek proxy
+            └─ https://api.deepseek.com/chat/completions
+```
+
+浏览器只调用本项目后端，不会拿到 `DEEPSEEK_API_KEY`。服务端代理会做 origin allowlist、body size limit、rate limit、DeepSeek timeout，并统一返回 no-store JSON。
 
 ## 仓库结构
 
 ```text
 .
-├── app/                     # Next.js 路由入口
-├── components/
-│   ├── ChatSimulator.jsx    # 主应用入口组件
-│   └── chat/                # 聊天模拟器业务模块
-├── data/                    # 正式业务数据（剧情/角色/章节/话术）
-├── public/                  # 正式静态资源
-├── scripts/                 # 启动/验证脚本
-├── docs/                    # 项目文档
-└── output/visual-baseline/  # 视觉基线截图
+├── app/                     # Next.js 页面与 API routes
+│   └── api/ai/chat/         # DeepSeek 服务端代理
+├── components/              # 聊天模拟器 UI 与游戏运行时
+├── data/                    # 剧情、角色、章节、话术数据
+├── docs/                    # 生产部署与开源说明
+├── lib/ai/                  # DeepSeek 服务端客户端
+├── public/                  # 头像、favicon、静态资源
+├── scripts/                 # 仓库、AI、视觉验证脚本
+└── output/visual-baseline/  # 只保留 baseline 截图；current 截图不提交
 ```
 
 ## 快速开始
 
 ```bash
 npm install
+cp .env.example .env.local
+# 在 .env.local 填入 DEEPSEEK_API_KEY
 npm run dev
-# 或
+```
+
+生产构建：
+
+```bash
 npm run build
 npm run start -- --port 4180
 ```
 
+## 环境变量
+
+```bash
+DEEPSEEK_API_KEY=你的 DeepSeek API Key
+DEEPSEEK_MODEL=deepseek-v4-flash
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+DEEPSEEK_TIMEOUT_MS=8000
+APP_PUBLIC_URL=https://chat.vibecoco.ai
+AI_ALLOWED_ORIGINS=https://chat.vibecoco.ai
+AI_MAX_REQUEST_BODY_BYTES=16384
+AI_RATE_LIMIT_WINDOW_MS=60000
+AI_RATE_LIMIT_MAX_REQUESTS=30
+```
+
+`DEEPSEEK_API_KEY` 是服务端变量，不能使用 `NEXT_PUBLIC_*` 前缀，也不能提交到 git。
+
 ## 常用验证
 
 ```bash
-# 仓库结构与数据链路检查
+# 全量本地验证
+npm run verify
+
+# 单项验证
 python3 scripts/check_repository.py
-
-# 视觉基线校验
-python3 scripts/verify_visual_baseline.py
-
-# 应用构建
+npm run verify:ai
 npm run build
+python3 scripts/verify_visual_baseline.py
+npm audit --omit=dev
 ```
 
-## 当前验证结论
+`verify:ai` 使用 mock DeepSeek 请求验证生产关键路径：endpoint、模型、鉴权来源、thinking disabled、origin allowlist、payload size limit、health route。
 
-- visual baseline：`score=97`，关键状态 `home/name/playing/ending` 全部通过
-- root app：`npm run build` 通过
+## Clone 体积约定
 
-## 当前开发边界
+为避免仓库越来越慢：
 
-- **日常开发目录**：`app/`、`components/`、`data/`、`public/`
-- **视觉基线目录**：`output/visual-baseline/`
-
-## 维护约定
-
-1. `output/visual-baseline/` 用于界面回归对照，不作为运行时代码路径
-2. 日常业务迭代统一在根目录应用进行（`app/`、`components/`、`data/`、`public/`）
-3. 修改结构化资产或源码前，先保留现有验证脚本作为回归基线
-4. 提交前至少运行：
-   - `python3 scripts/check_repository.py`
-   - `python3 scripts/verify_visual_baseline.py`
-   - `npm run build`
+- 不提交 `node_modules/`、`.next/`、`.env*`、日志、临时下载
+- 不提交 `output/visual-baseline/current-*.png`
+- 只保留必要 baseline 截图；current 截图需要时本地生成
+- 新增图片资源前先压缩，避免把设计源文件或超大截图放进 git
 
 ## 新增剧本流程
 
@@ -142,7 +171,7 @@ public/yue.png
 
 ### 3. 结局推荐直接写在 ending 节点里
 
-最稳妥的做法是在结局场景里直接写 `endingData`，这样**不需要改 JS 逻辑**：
+最稳妥的做法是在结局场景里直接写 `endingData`，这样不需要改 JS 逻辑：
 
 ```json
 {
@@ -167,30 +196,10 @@ public/yue.png
 
 否则新的剧情前缀不会被正确识别，结局会落到默认角色池。
 
-### 4. 如果章节结构变化，再改章节文案
+## 文档
 
-如果新剧本不再沿用当前 1~6 章结构，需要同步更新：
-
-```bash
-data/chapters.json
-```
-
-否则顶部章节标题仍然会按旧映射显示。
-
-### 5. 新增后最少做这些验证
-
-```bash
-python3 scripts/check_repository.py
-npm run build
-```
-
-然后手动跑一遍新剧本主路径，至少确认：
-
-- 能正常进入新角色开局
-- 选择分支后不会卡死
-- 能走到结局页
-- 头像和文案资源都正常显示
-
-## 相关文档
-
-- `docs/project-roadmap.md`
+- [`docs/production.md`](docs/production.md) — 生产部署、安全边界、环境变量
+- [`docs/open-source.md`](docs/open-source.md) — 开源范围与发布说明
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — 贡献指南
+- [`SECURITY.md`](SECURITY.md) — 安全策略
+- [`LICENSE`](LICENSE) — MIT License

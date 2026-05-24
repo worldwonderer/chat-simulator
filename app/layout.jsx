@@ -1,6 +1,19 @@
 export const metadata = {
+  metadataBase: new URL(process.env.APP_PUBLIC_URL || "https://chat.vibecoco.ai"),
   title: "聊天模拟器",
   description: "互动式聊天剧情模拟器",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: "聊天模拟器",
+    description: "互动式聊天剧情模拟器",
+    url: "https://chat.vibecoco.ai/",
+    siteName: "聊天模拟器",
+    locale: "zh_CN",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }) {

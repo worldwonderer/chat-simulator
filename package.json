@@ -1,13 +1,28 @@
 {
   "name": "chat-simulator",
+  "version": "0.1.0",
+  "description": "Interactive Chinese chat-story simulator with a server-side DeepSeek AI proxy.",
   "private": true,
+  "license": "MIT",
+  "homepage": "https://chat.vibecoco.ai/",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/worldwonderer/chat-simulator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/worldwonderer/chat-simulator/issues"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "verify:ai": "node --no-warnings scripts/verify_ai_integration.mjs",
+    "verify:repo": "python3 scripts/check_repository.py",
+    "verify:visual": "python3 scripts/verify_visual_baseline.py",
+    "verify": "python3 scripts/check_repository.py && npm run verify:ai && npm run build && python3 scripts/verify_visual_baseline.py"
   },
   "dependencies": {
-    "next": "latest",
+    "next": "16.2.6",
     "react": "latest",
     "react-dom": "latest"
   },
@@ -15,5 +30,8 @@
     "@types/node": "25.5.2",
     "@types/react": "19.2.14",
     "typescript": "6.0.2"
+  },
+  "overrides": {
+    "postcss": "8.5.15"
   }
 }

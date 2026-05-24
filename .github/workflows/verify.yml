@@ -24,11 +24,20 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
-      - name: Repository structure check
-        run: python3 scripts/check_repository.py
-
       - name: Install app dependencies
         run: npm ci
 
+      - name: Repository structure check
+        run: python3 scripts/check_repository.py
+
+      - name: Verify AI backend integration
+        run: npm run verify:ai
+
       - name: Build app
         run: npm run build
+
+      - name: Verify visual baseline assets
+        run: python3 scripts/verify_visual_baseline.py
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev

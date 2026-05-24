@@ -10,6 +10,7 @@ PUBLIC_ROOT = ROOT / 'public'
 REQUIRED_FILES = [
     ROOT / 'README.md',
     ROOT / 'package.json',
+    ROOT / 'next.config.js',
     ROOT / 'app' / 'layout.jsx',
     ROOT / 'app' / 'page.jsx',
     ROOT / 'components' / 'ChatSimulator.jsx',
@@ -20,11 +21,23 @@ REQUIRED_FILES = [
     ROOT / 'components' / 'chat' / 'gameData.js',
     ROOT / 'components' / 'chat' / 'gameEngine.js',
     ROOT / 'components' / 'chat' / 'store.js',
+    ROOT / 'components' / 'chat' / 'aiDialogue.js',
+    ROOT / 'app' / 'api' / 'ai' / 'chat' / 'route.js',
+    ROOT / 'app' / 'api' / 'health' / 'route.js',
+    ROOT / 'app' / 'icon.png',
+    ROOT / 'lib' / 'ai' / 'deepseek.js',
+    ROOT / '.env.example',
+    ROOT / 'LICENSE',
+    ROOT / 'CONTRIBUTING.md',
+    ROOT / 'SECURITY.md',
+    ROOT / 'docs' / 'production.md',
+    ROOT / 'docs' / 'open-source.md',
     ROOT / 'data' / 'girls.json',
     ROOT / 'data' / 'chapters.json',
     ROOT / 'data' / 'scenes.json',
     ROOT / 'data' / 'tactics.json',
     ROOT / 'scripts' / 'verify_visual_baseline.py',
+    ROOT / 'scripts' / 'verify_ai_integration.mjs',
     ROOT / 'public' / 'static-assets' / 'chunks' / '0x.pxwmy6tt~x.css',
     ROOT / 'public' / 'static-assets' / 'chunks' / '0h7l~nyi9rz9m.css',
 ]
@@ -37,6 +50,87 @@ girls = json.loads((ROOT / 'data' / 'girls.json').read_text())
 chapters = json.loads((ROOT / 'data' / 'chapters.json').read_text())
 scenes = json.loads((ROOT / 'data' / 'scenes.json').read_text())
 tactics = json.loads((ROOT / 'data' / 'tactics.json').read_text())
+
+env_example = (ROOT / '.env.example').read_text()
+deepseek_source = (ROOT / 'lib' / 'ai' / 'deepseek.js').read_text()
+route_source = (ROOT / 'app' / 'api' / 'ai' / 'chat' / 'route.js').read_text()
+client_ai_source = (ROOT / 'components' / 'chat' / 'aiDialogue.js').read_text()
+ai_verify_source = (ROOT / 'scripts' / 'verify_ai_integration.mjs').read_text()
+package_data = json.loads((ROOT / 'package.json').read_text())
+lock_data = json.loads((ROOT / 'package-lock.json').read_text())
+layout_source = (ROOT / 'app' / 'layout.jsx').read_text()
+health_source = (ROOT / 'app' / 'api' / 'health' / 'route.js').read_text()
+readme_source = (ROOT / 'README.md').read_text()
+production_doc = (ROOT / 'docs' / 'production.md').read_text()
+open_source_doc = (ROOT / 'docs' / 'open-source.md').read_text()
+gitignore_source = (ROOT / '.gitignore').read_text()
+next_config_source = (ROOT / 'next.config.js').read_text()
+
+
+if 'turbopack' not in next_config_source or 'root: __dirname' not in next_config_source:
+    raise SystemExit('next.config.js must pin Turbopack root to this project')
+if package_data.get('license') != 'MIT':
+    raise SystemExit('package.json must declare the MIT license')
+if package_data.get('homepage') != 'https://chat.vibecoco.ai/':
+    raise SystemExit('package.json must point homepage to the production demo URL')
+if package_data.get('scripts', {}).get('verify') != 'python3 scripts/check_repository.py && npm run verify:ai && npm run build && python3 scripts/verify_visual_baseline.py':
+    raise SystemExit('package.json must expose the full local verification pipeline')
+if lock_data.get('packages', {}).get('', {}).get('license') != 'MIT':
+    raise SystemExit('package-lock.json root package metadata must be synced with package.json')
+if package_data.get('scripts', {}).get('verify:ai') != 'node --no-warnings scripts/verify_ai_integration.mjs':
+    raise SystemExit('package.json must expose npm run verify:ai')
+if package_data.get('dependencies', {}).get('next') != '16.2.6':
+    raise SystemExit('package.json must pin next to the verified build version 16.2.6')
+if package_data.get('overrides', {}).get('postcss') != '8.5.15':
+    raise SystemExit('package.json must override postcss to the audited patched version 8.5.15')
+if 'DEEPSEEK_MODEL=deepseek-v4-flash' not in env_example:
+    raise SystemExit('.env.example must document DEEPSEEK_MODEL=deepseek-v4-flash')
+if 'DEEPSEEK_API_KEY=' not in env_example:
+    raise SystemExit('.env.example must document DEEPSEEK_API_KEY')
+
+if 'APP_PUBLIC_URL=https://chat.vibecoco.ai' not in env_example or 'AI_ALLOWED_ORIGINS=https://chat.vibecoco.ai' not in env_example:
+    raise SystemExit('.env.example must document production origin settings')
+if 'NEXT_PUBLIC_DEEPSEEK' in env_example:
+    raise SystemExit('.env.example must not suggest browser-exposed DeepSeek variables')
+if 'DEEPSEEK_API_KEY' not in health_source or 'deepseekConfigured' not in health_source:
+    raise SystemExit('Health route must report DeepSeek configuration without exposing secrets')
+if 'metadataBase' not in layout_source or '/favicon.ico' not in layout_source or '/apple-touch-icon.png' not in layout_source:
+    raise SystemExit('Layout metadata must configure production URL and icons')
+if 'https://chat.vibecoco.ai/' not in readme_source or 'MIT' not in readme_source:
+    raise SystemExit('README must document the production demo URL and MIT license')
+if 'DEEPSEEK_API_KEY' not in production_doc or 'deepseek-v4-flash' not in production_doc:
+    raise SystemExit('Production docs must document server-only DeepSeek configuration')
+
+if 'MIT License' not in (ROOT / 'LICENSE').read_text():
+    raise SystemExit('Open source files must include an MIT license')
+if 'What is included' not in open_source_doc or 'What is intentionally excluded' not in open_source_doc:
+    raise SystemExit('Open source notes must document included and excluded project contents')
+if 'Vercel project `chat-vibecoco-ai`' not in production_doc or 'main` branch triggers the production deployment automatically' not in production_doc:
+    raise SystemExit('Production docs must document Vercel Git auto-deploy from main')
+if 'output/visual-baseline/current-*.png' not in gitignore_source or 'output/visual-current/' not in gitignore_source:
+    raise SystemExit('.gitignore must exclude generated visual screenshots')
+tracked_current = [
+    p for p in (ROOT / 'output' / 'visual-baseline').glob('current-*.png')
+    if p.exists()
+]
+if tracked_current:
+    raise SystemExit('Generated current visual screenshots must not be present in the repository tree: ' + ', '.join(str(p.relative_to(ROOT)) for p in tracked_current))
+if 'sk-' in env_example:
+    raise SystemExit('.env.example must not contain a real API key')
+if 'deepseek-v4-flash' not in deepseek_source:
+    raise SystemExit('DeepSeek client must default to deepseek-v4-flash')
+if 'https://api.deepseek.com' not in deepseek_source or '/chat/completions' not in deepseek_source:
+    raise SystemExit('DeepSeek client must target the OpenAI-compatible DeepSeek chat completions endpoint')
+if 'thinking: { type: "disabled" }' not in deepseek_source:
+    raise SystemExit('DeepSeek client must disable thinking mode for direct chat-bubble replies')
+if 'createDeepSeekChatCompletion' not in route_source:
+    raise SystemExit('AI route must call the DeepSeek completion client')
+if '/api/ai/chat' not in client_ai_source:
+    raise SystemExit('Client AI dialogue helper must call the local AI route')
+if 'deepseek-v4-flash' not in ai_verify_source or 'https://api.deepseek.com/chat/completions' not in ai_verify_source:
+    raise SystemExit('AI integration verifier must assert the DeepSeek model and endpoint')
+if "thinkingType !== 'disabled'" not in ai_verify_source:
+    raise SystemExit('AI integration verifier must assert disabled thinking mode')
 
 if not isinstance(girls, dict) or not girls:
     raise SystemExit('girls.json must be a non-empty object')
