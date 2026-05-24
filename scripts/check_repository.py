@@ -176,6 +176,8 @@ if 'unoptimized,' not in image_shim_source or 'placeholder,' not in image_shim_s
     raise SystemExit('ImageShim must consume Next/Image-only props before spreading native img props')
 if 'deepseek-v4-flash' not in ai_verify_source or 'https://api.deepseek.com/chat/completions' not in ai_verify_source:
     raise SystemExit('AI integration verifier must assert the DeepSeek model and endpoint')
+if 'unwrapJsonContent' not in deepseek_source or 'JSON-shaped AI replies should be unwrapped before display' not in ai_verify_source:
+    raise SystemExit('AI response normalization must unwrap JSON-shaped provider replies before display')
 if "process.env.DEEPSEEK_MODEL = '   '" not in ai_verify_source or 'whitespace-only DEEPSEEK_MODEL must fall back' not in ai_verify_source:
     raise SystemExit('AI integration verifier must assert whitespace-only DEEPSEEK_MODEL falls back to the default')
 if "thinkingType !== 'disabled'" not in ai_verify_source:

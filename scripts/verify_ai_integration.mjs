@@ -149,6 +149,22 @@ if (okResponse.headers.get('access-control-allow-origin') !== 'https://chat.vibe
   throw new Error('AI route did not echo the allowed production origin');
 }
 
+nextMockContent = '```json\n{"content":"别想太多啦。"}\n```';
+const jsonShapedResponse = await POST(buildRequest(validPayload));
+const jsonShapedData = await jsonShapedResponse.json();
+
+if (jsonShapedResponse.status !== 200 || jsonShapedData.content !== '别想太多啦。') {
+  throw new Error(`JSON-shaped AI replies should be unwrapped before display: ${JSON.stringify({ status: jsonShapedResponse.status, jsonShapedData })}`);
+}
+
+nextMockContent = '{"debug":true}';
+const invalidJsonShapedResponse = await POST(buildRequest(validPayload));
+const invalidJsonShapedData = await invalidJsonShapedResponse.json();
+
+if (invalidJsonShapedResponse.status !== 502 || invalidJsonShapedData.error !== 'empty_ai_content') {
+  throw new Error(`JSON-shaped AI replies without display text should be rejected: ${JSON.stringify({ status: invalidJsonShapedResponse.status, invalidJsonShapedData })}`);
+}
+
 nextMockContent = '超长回复'.repeat(50);
 const overlongResponse = await POST(buildRequest(validPayload));
 const overlongData = await overlongResponse.json();
@@ -308,6 +324,7 @@ console.log(JSON.stringify({
   validation_error: badData.error,
   blocked_origin_error: blockedOriginData.error,
   oversized_error: oversizedData.error,
+  json_shaped_content: jsonShapedData.content,
   overlong_error: overlongData.error,
   max_tokens: captured.maxTokens,
   prompt_context: {
