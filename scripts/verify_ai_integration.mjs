@@ -40,7 +40,7 @@ function buildRequest(body, headers = {}) {
 }
 
 const validPayload = {
-  player: { name: '李雷' },
+  player: { name: '阿泽' },
   character: {
     id: 'lin',
     name: '林晓柔',
@@ -101,6 +101,7 @@ const userPromptJson = captured.userPrompt.split('\n').at(-1);
 const userPromptPayload = JSON.parse(userPromptJson);
 
 if (
+  userPromptPayload.player.name !== '阿泽' ||
   userPromptPayload.character.name !== '林晓柔' ||
   !userPromptPayload.character.description.includes('免单套路') ||
   userPromptPayload.scene.tactic !== 'Love Bombing' ||
@@ -182,6 +183,7 @@ console.log(JSON.stringify({
   overlong_error: overlongData.error,
   max_tokens: captured.maxTokens,
   prompt_context: {
+    player: userPromptPayload.player.name,
     character: userPromptPayload.character.name,
     scene: userPromptPayload.scene.id,
     targetLine: userPromptPayload.targetLine,
