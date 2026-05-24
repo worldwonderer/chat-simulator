@@ -12,6 +12,7 @@ REQUIRED_FILES = [
     ROOT / 'README.md',
     ROOT / 'package.json',
     ROOT / 'next.config.js',
+    ROOT / 'Makefile',
     ROOT / 'app' / 'layout.jsx',
     ROOT / 'app' / 'page.jsx',
     ROOT / 'components' / 'ChatSimulator.jsx',
@@ -80,6 +81,7 @@ production_doc = (ROOT / 'docs' / 'production.md').read_text()
 open_source_doc = (ROOT / 'docs' / 'open-source.md').read_text()
 gitignore_source = (ROOT / '.gitignore').read_text()
 next_config_source = (ROOT / 'next.config.js').read_text()
+makefile_source = (ROOT / 'Makefile').read_text()
 
 
 if 'turbopack' not in next_config_source or 'root: __dirname' not in next_config_source:
@@ -90,6 +92,8 @@ if package_data.get('homepage') != 'https://chat.vibecoco.ai/':
     raise SystemExit('package.json must point homepage to the production demo URL')
 if package_data.get('scripts', {}).get('verify') != 'python3 scripts/check_repository.py && npm run verify:ai && npm run build && python3 scripts/verify_visual_baseline.py':
     raise SystemExit('package.json must expose the full local verification pipeline')
+if 'verify:\n\tnpm run verify' not in makefile_source or 'verify-ai:\n\tnpm run verify:ai' not in makefile_source:
+    raise SystemExit('Makefile verify target must delegate to the full npm verification pipeline')
 if lock_data.get('packages', {}).get('', {}).get('license') != 'MIT':
     raise SystemExit('package-lock.json root package metadata must be synced with package.json')
 if package_data.get('scripts', {}).get('verify:ai') != 'node --no-warnings scripts/verify_ai_integration.mjs':
